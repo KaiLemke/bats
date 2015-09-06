@@ -1,29 +1,4 @@
 kid,schlag ,k.typ,ko.a,ko.d,w.t,w.b,k.z,block,aves,mamm,invert,fl.kot,q.typ,fl.art,fl.ges,fl.m,fl.w,fl.ad,fl.juv
-hz001,hz,dk,10,5,23,w,i,n,m,n,n,1,0,n,0,0,0,0,0
-hz001,hz,dk,12,1,13,b,i,n,m,n,n,1,0,n,0,0,0,0,0
-hz002,hz,dk,10,5,23,w,i,i,m,n,hu,NA,0,n,0,0,0,0,0
-hz002,hz,dk,12,1,13,b,i,n,m,n,n,1,0,n,0,0,0,0,0
-hz003,hz,dk,12,1,13,b,i,n,m,n,n,1,0,n,0,0,0,0,0
-hz004,hz,bgk,11,1,27,s,lb,n,k,n,n,1,5,M.nattereri,1,1,0,1,0
-hz005,hz,fk,10,5,23,w,i,n,n,n ,n,1,0,n,0,0,0,0,0
-hz005,hz,fk,12,1,13,b,sb,n,n,n,n,1,0,n,0,0,0,0,0
-hz006,hz,mk,12,1,13,b,i,n,m,n,n,1,0,n,0,0,0,0,0
-hz007,hz,bgk,12,1,13,b,sb,n,m,n,n,0,0,n,0,0,0,0,0
-hz008,hz,mk,11,1,27,s,lb,n,m,n,n,1,0,n,0,0,0,0,0
-hz009,hz,mk,12,1,13,b,sb,n,m,hm,n,0,0,n,0,0,0,0,0
-hz022,hz,bgk,12,1,13,b,i,n,m.k,n,n,1,0,n,0,0,0,0,0
-hz023,hz,svk,10,5,23,w,i,n,k,n,n,1,0,n,0,0,0,0,0
-hz023,hz,svk,12,1,13,b,i,n,k,n,n,1,0,n,0,0,0,0,0
-hz024,hz,bgk,10,5,23,w,i,n,tm,n,n,NA,0,n,0,0,0,0,0
-hz024,hz,bgk,12,1,13,b,i,n,m,n,n,1,0,n,0,0,0,0,0
-hz025,hz,bgk,10,5,23,w,i,n,k.m,n,n,NA,0,n,0,0,0,0,0
-hz025,hz,bgk,12,1,13,b,i,n,m,n,n,1,0,n,0,0,0,0,0
-hz026,hz,bgk,12,1,13,b,sb,n,k,n,n,0,0,n,0,0,0,0,0
-hz027,hz,bgk,10,5,23,w,i,n,m,wm,n,NA,0,n,0,0,0,0,0
-hz027,hz,bgk,12,1,13,b,i,n,n,hm,n,0,0,n,0,0,0,0,0
-hz028,hz,bgk,10,5,23,w,sb,n,k,n,n,1,0,n,0,0,0,0,0
-hz029,hz,bgk,10,5,23,w,i,n,m,n,n,1,5,M.mystacinus/brandtii,4,NA,NA,NA,NA
-hz029,hz,bgk,12,1,13,b,sb,n,m,n,n,1,0,n,0,0,0,0,0
 hz030,hz,bgk,10,5,23,w,i,n,k,n,n,NA,0,n,0,0,0,0,0
 hz031,hz,bgk,10,5,23,w,i,n,k,n,n,NA,0,n,0,0,0,0,0
 hz031,hz,bgk,12,1,13,b,i,n,k,n,n,1,0,n,0,0,0,0,0
