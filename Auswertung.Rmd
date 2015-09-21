@@ -1,0 +1,71 @@
+---
+title: "Auswertung"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    toc: true
+    theme: journal
+    number_sections: true
+  pdf_document:
+    toc: true
+    number_sections: true
+  md_document:
+    toc: true      
+    variant: markdown_github
+    fig_width: 7
+    fig_height: 6
+---
+
+# Datensätze: gesamt, init und monitoring
+
+Zuerst müssen wir die Gesamttabelle einlesen und die Datentypen gemäß werte.csv korrigieren.
+
+```{r}
+gesamt <- read.csv("gesamttabelle.csv", header=T)
+
+# korrigiere Datentypen
+gesamt$gpsr  <- as.double(gesamt$gpsr)
+gesamt$gpsh  <- as.double(gesamt$koa)
+gesamt$koa  <- as.factor(gesamt$koa)
+gesamt$kod  <- as.factor(gesamt$kod)
+gesamt$wt  <- as.numeric(gesamt$wt)
+gesamt$vn  <- as.factor(gesamt$vn)
+gesamt$aves  <- as.factor(gesamt$aves)
+gesamt$mamm  <- as.factor(gesamt$mamm)
+gesamt$invert  <- as.factor(gesamt$invert)
+gesamt$flkot  <- as.factor(gesamt$flkot)
+gesamt$qtyp  <- as.factor(gesamt$qtyp)
+
+# Subsets für 2010 und 2011 bis 2015
+init  <- subset(gesamt, koa == 10)
+monitoring  <- subset(gesamt, koa != 10)
+```
+
+# Welche Arten haben ihre Sommerquartiere im Untersuchungsgebiet?
+
+Hierfür brauchen wir Datensätze, die nur die Zeilen enthalten, in denen eine Art bestimmt wurde.
+
+```{r}
+gesamt.flart <- subset(gesamt, flart != 0)
+init.flart <- subset(init, flart != 0)
+monitoring.flart <- subset(monitoring, flart != 0)
+```
+## gezählte Individuen pro Art
+
+```{r}
+print("2010 bis 2015"); summary(gesamt.flart$flart)
+print("2010"); summary(init.flart$flart)
+print("2011 bis 2015"); summary(monitoring.flart$flart)
+```
+## Prozente der gezählten Individuen pro Art
+
+```{r}
+print("2010 bis 2015"); summary(gesamt.flart$flart) / sum( summary(gesamt.flart$flart) ) * 100
+print("2010"); summary(init.flart$flart) / sum( summary(init.flart$flart) ) * 100
+print("2011 bis 2015"); summary(monitoring.flart$flart) / sum( summary(monitoring.flart$flart) ) * 100
+```
+Die deutliche Zunahme der Wasserfledermuas von 3 auf 18 % dürfte eher Zufall sein, da 2010 nur ein Einzeltier gefunden wurde, ähnliches gilt wohl für Abendsegler, Rauhhaut-- und umgekehrt Mückenfledermaus. Anders sieht es wohl beim Braunen Langohr aus, das von 27 auf 6 % gefallen ist.
+
+
+```{r}
+```
