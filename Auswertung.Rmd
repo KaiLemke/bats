@@ -50,21 +50,68 @@ gesamt.flart <- subset(gesamt, flart != 0)
 init.flart <- subset(init, flart != 0)
 monitoring.flart <- subset(monitoring, flart != 0)
 ```
-## gezählte Individuen pro Art
+## insgesamt
+
+### gezählte Individuen pro Art
 
 ```{r}
 print("2010 bis 2015"); summary(gesamt.flart$flart)
 print("2010"); summary(init.flart$flart)
 print("2011 bis 2015"); summary(monitoring.flart$flart)
 ```
-## Prozente der gezählten Individuen pro Art
+### Prozente der gezählten Individuen pro Art
 
 ```{r}
 print("2010 bis 2015"); summary(gesamt.flart$flart) / sum( summary(gesamt.flart$flart) ) * 100
 print("2010"); summary(init.flart$flart) / sum( summary(init.flart$flart) ) * 100
 print("2011 bis 2015"); summary(monitoring.flart$flart) / sum( summary(monitoring.flart$flart) ) * 100
 ```
-Die deutliche Zunahme der Wasserfledermuas von 3 auf 18 % dürfte eher Zufall sein, da 2010 nur ein Einzeltier gefunden wurde, ähnliches gilt wohl für Abendsegler, Rauhhaut-- und umgekehrt Mückenfledermaus. Anders sieht es wohl beim Braunen Langohr aus, das von 27 auf 6 % gefallen ist.
+2010 wurden sieben Arten gefunden:
+
+* Wasserfledermaus (_Myotis daubentonii_)
+* Großes Mausohr (_Myotis myotis_)
+* Bartfledermäuse (_Myotis mystacinus_ oder _Myotis brandtii_)
+* Fransenfledermaus (_Myotis nattereri_)
+* Großer Abernsegler (_Nyctalus noctula_)
+* Rauhautfledermaus (_Pipistrellus nathusii_)
+* Braunes Langohr (_Plecotus auritus_)
+
+Außerdem eine nicht weiter bestimmte _Pipistrellus_-Art.
+
+In der Summe der Folgejahre habe ich nur noch fünf Arten gefunden:
+
+* Wasserfledermuas
+* Großes Mausohr
+* Fransenfledermaus
+* Mückenfledermaus (_Pipistrellus pygmaeus_)
+* Braunes Langohr
+
+Die drei verschwundenen Arten kamen 2010 nur mit ein und zwei Individuen vor, d.h. es kann sich hier um statistische Randeffekte handeln.
+Die deutliche Zunahme der Wasserfledermuas von 3 auf 18 % dürfte ebenfalls eher Zufall sein, da 2010 nur ein Einzeltier gefunden wurde. Ahnliches gilt wohl für Abendsegler, Rauhhaut- und umgekehrt Mückenfledermaus. 
+
+Anders sieht es wohl beim Braunen Langohr aus, das von 27 auf 6 % gefallen ist.
+
+## nur Wochenstuben
+
+```{r}
+gesamt.flart.ws <- subset(gesamt.flart, qtyp == 5)
+init.flart.ws <- subset(init.flart, qtyp == 5)
+monitoring.flart.ws <- subset(monitoring.flart, qtyp == 5)
+```
+### gezählte Individuen pro Art
+
+```{r}
+print("2010 bis 2015"); summary(gesamt.flart.ws$flart)
+print("2010"); summary(init.flart.ws$flart)
+print("2011 bis 2015"); summary(monitoring.flart.ws$flart)
+```
+### Prozente der gezählten Individuen pro Art
+
+```{r}
+print("2010 bis 2015"); summary(gesamt.flart.ws$flart) / sum( summary(gesamt.flart.ws$flart) ) * 100
+print("2010"); summary(init.flart.ws$flart) / sum( summary(init.flart.ws$flart) ) * 100
+print("2011 bis 2015"); summary(monitoring.flart.ws$flart) / sum( summary(monitoring.flart.ws$flart) ) * 100
+```
 
 
 ```{r}

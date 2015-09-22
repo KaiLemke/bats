@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="date" content="2015-09-21" />
+<meta name="date" content="2015-09-22" />
 
 <title>Auswertung</title>
 
@@ -83,15 +83,21 @@ img {
 
 <div id="header">
 <h1 class="title">Auswertung</h1>
-<h4 class="date"><em>21 September 2015</em></h4>
+<h4 class="date"><em>22 September 2015</em></h4>
 </div>
 
 <div id="TOC">
 <ul>
 <li><a href="#datensatze-gesamt-init-und-monitoring"><span class="toc-section-number">1</span> Datensätze: gesamt, init und monitoring</a></li>
 <li><a href="#welche-arten-haben-ihre-sommerquartiere-im-untersuchungsgebiet"><span class="toc-section-number">2</span> Welche Arten haben ihre Sommerquartiere im Untersuchungsgebiet?</a><ul>
-<li><a href="#gezahlte-individuen-pro-art"><span class="toc-section-number">2.1</span> gezählte Individuen pro Art</a></li>
-<li><a href="#prozente-der-gezahlten-individuen-pro-art"><span class="toc-section-number">2.2</span> Prozente der gezählten Individuen pro Art</a></li>
+<li><a href="#insgesamt"><span class="toc-section-number">2.1</span> insgesamt</a><ul>
+<li><a href="#gezahlte-individuen-pro-art"><span class="toc-section-number">2.1.1</span> gezählte Individuen pro Art</a></li>
+<li><a href="#prozente-der-gezahlten-individuen-pro-art"><span class="toc-section-number">2.1.2</span> Prozente der gezählten Individuen pro Art</a></li>
+</ul></li>
+<li><a href="#nur-wochenstuben"><span class="toc-section-number">2.2</span> nur Wochenstuben</a><ul>
+<li><a href="#gezahlte-individuen-pro-art-1"><span class="toc-section-number">2.2.1</span> gezählte Individuen pro Art</a></li>
+<li><a href="#prozente-der-gezahlten-individuen-pro-art-1"><span class="toc-section-number">2.2.2</span> Prozente der gezählten Individuen pro Art</a></li>
+</ul></li>
 </ul></li>
 </ul>
 </div>
@@ -124,8 +130,10 @@ monitoring  &lt;- subset(gesamt, koa != 10)</code></pre>
 <pre class="r"><code>gesamt.flart &lt;- subset(gesamt, flart != 0)
 init.flart &lt;- subset(init, flart != 0)
 monitoring.flart &lt;- subset(monitoring, flart != 0)</code></pre>
-<div id="gezahlte-individuen-pro-art" class="section level2">
-<h2><span class="header-section-number">2.1</span> gezählte Individuen pro Art</h2>
+<div id="insgesamt" class="section level2">
+<h2><span class="header-section-number">2.1</span> insgesamt</h2>
+<div id="gezahlte-individuen-pro-art" class="section level3">
+<h3><span class="header-section-number">2.1.1</span> gezählte Individuen pro Art</h3>
 <pre class="r"><code>print(&quot;2010 bis 2015&quot;); summary(gesamt.flart$flart)</code></pre>
 <pre><code>## [1] &quot;2010 bis 2015&quot;</code></pre>
 <pre><code>##                     0         M.daubentonii              M.myotis 
@@ -157,8 +165,8 @@ monitoring.flart &lt;- subset(monitoring, flart != 0)</code></pre>
 ##          Plec.auritus 
 ##                     5</code></pre>
 </div>
-<div id="prozente-der-gezahlten-individuen-pro-art" class="section level2">
-<h2><span class="header-section-number">2.2</span> Prozente der gezählten Individuen pro Art</h2>
+<div id="prozente-der-gezahlten-individuen-pro-art" class="section level3">
+<h3><span class="header-section-number">2.1.2</span> Prozente der gezählten Individuen pro Art</h3>
 <pre class="r"><code>print(&quot;2010 bis 2015&quot;); summary(gesamt.flart$flart) / sum( summary(gesamt.flart$flart) ) * 100</code></pre>
 <pre><code>## [1] &quot;2010 bis 2015&quot;</code></pre>
 <pre><code>##                     0         M.daubentonii              M.myotis 
@@ -189,7 +197,100 @@ monitoring.flart &lt;- subset(monitoring, flart != 0)</code></pre>
 ##              1.176471              0.000000              2.352941 
 ##          Plec.auritus 
 ##              5.882353</code></pre>
-<p>Die deutliche Zunahme der Wasserfledermuas von 3 auf 18 % dürfte eher Zufall sein, da 2010 nur ein Einzeltier gefunden wurde, ähnliches gilt wohl für Abendsegler, Rauhhaut– und umgekehrt Mückenfledermaus. Anders sieht es wohl beim Braunen Langohr aus, das von 27 auf 6 % gefallen ist.</p>
+<p>2010 wurden sieben Arten gefunden:</p>
+<ul>
+<li>Wasserfledermaus (<em>Myotis daubentonii</em>)</li>
+<li>Großes Mausohr (<em>Myotis myotis</em>)</li>
+<li>Bartfledermäuse (<em>Myotis mystacinus</em> oder <em>Myotis brandtii</em>)</li>
+<li>Fransenfledermaus (<em>Myotis nattereri</em>)</li>
+<li>Großer Abernsegler (<em>Nyctalus noctula</em>)</li>
+<li>Rauhautfledermaus (<em>Pipistrellus nathusii</em>)</li>
+<li>Braunes Langohr (<em>Plecotus auritus</em>)</li>
+</ul>
+<p>Außerdem eine nicht weiter bestimmte <em>Pipistrellus</em>-Art.</p>
+<p>In der Summe der Folgejahre habe ich nur noch fünf Arten gefunden:</p>
+<ul>
+<li>Wasserfledermuas</li>
+<li>Großes Mausohr</li>
+<li>Fransenfledermaus</li>
+<li>Mückenfledermaus (<em>Pipistrellus pygmaeus</em>)</li>
+<li>Braunes Langohr</li>
+</ul>
+<p>Die drei verschwundenen Arten kamen 2010 nur mit ein und zwei Individuen vor, d.h. es kann sich hier um statistische Randeffekte handeln. Die deutliche Zunahme der Wasserfledermuas von 3 auf 18 % dürfte ebenfalls eher Zufall sein, da 2010 nur ein Einzeltier gefunden wurde. Ahnliches gilt wohl für Abendsegler, Rauhhaut- und umgekehrt Mückenfledermaus.</p>
+<p>Anders sieht es wohl beim Braunen Langohr aus, das von 27 auf 6 % gefallen ist.</p>
+</div>
+</div>
+<div id="nur-wochenstuben" class="section level2">
+<h2><span class="header-section-number">2.2</span> nur Wochenstuben</h2>
+<pre class="r"><code>gesamt.flart.ws &lt;- subset(gesamt.flart, qtyp == 5)
+init.flart.ws &lt;- subset(init.flart, qtyp == 5)
+monitoring.flart.ws &lt;- subset(monitoring.flart, qtyp == 5)</code></pre>
+<div id="gezahlte-individuen-pro-art-1" class="section level3">
+<h3><span class="header-section-number">2.2.1</span> gezählte Individuen pro Art</h3>
+<pre class="r"><code>print(&quot;2010 bis 2015&quot;); summary(gesamt.flart.ws$flart)</code></pre>
+<pre><code>## [1] &quot;2010 bis 2015&quot;</code></pre>
+<pre><code>##                     0         M.daubentonii              M.myotis 
+##                     0                     9                     0 
+## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
+##                     1                    38                     1 
+##                   Pip          Pip.nathusii          Pip.pygmaeus 
+##                     0                     0                     0 
+##          Plec.auritus 
+##                    11</code></pre>
+<pre class="r"><code>print(&quot;2010&quot;); summary(init.flart.ws$flart)</code></pre>
+<pre><code>## [1] &quot;2010&quot;</code></pre>
+<pre><code>##                     0         M.daubentonii              M.myotis 
+##                     0                     0                     0 
+## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
+##                     1                     8                     1 
+##                   Pip          Pip.nathusii          Pip.pygmaeus 
+##                     0                     0                     0 
+##          Plec.auritus 
+##                     6</code></pre>
+<pre class="r"><code>print(&quot;2011 bis 2015&quot;); summary(monitoring.flart.ws$flart)</code></pre>
+<pre><code>## [1] &quot;2011 bis 2015&quot;</code></pre>
+<pre><code>##                     0         M.daubentonii              M.myotis 
+##                     0                     9                     0 
+## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
+##                     0                    30                     0 
+##                   Pip          Pip.nathusii          Pip.pygmaeus 
+##                     0                     0                     0 
+##          Plec.auritus 
+##                     5</code></pre>
+</div>
+<div id="prozente-der-gezahlten-individuen-pro-art-1" class="section level3">
+<h3><span class="header-section-number">2.2.2</span> Prozente der gezählten Individuen pro Art</h3>
+<pre class="r"><code>print(&quot;2010 bis 2015&quot;); summary(gesamt.flart.ws$flart) / sum( summary(gesamt.flart.ws$flart) ) * 100</code></pre>
+<pre><code>## [1] &quot;2010 bis 2015&quot;</code></pre>
+<pre><code>##                     0         M.daubentonii              M.myotis 
+##              0.000000             15.000000              0.000000 
+## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
+##              1.666667             63.333333              1.666667 
+##                   Pip          Pip.nathusii          Pip.pygmaeus 
+##              0.000000              0.000000              0.000000 
+##          Plec.auritus 
+##             18.333333</code></pre>
+<pre class="r"><code>print(&quot;2010&quot;); summary(init.flart.ws$flart) / sum( summary(init.flart.ws$flart) ) * 100</code></pre>
+<pre><code>## [1] &quot;2010&quot;</code></pre>
+<pre><code>##                     0         M.daubentonii              M.myotis 
+##                  0.00                  0.00                  0.00 
+## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
+##                  6.25                 50.00                  6.25 
+##                   Pip          Pip.nathusii          Pip.pygmaeus 
+##                  0.00                  0.00                  0.00 
+##          Plec.auritus 
+##                 37.50</code></pre>
+<pre class="r"><code>print(&quot;2011 bis 2015&quot;); summary(monitoring.flart.ws$flart) / sum( summary(monitoring.flart.ws$flart) ) * 100</code></pre>
+<pre><code>## [1] &quot;2011 bis 2015&quot;</code></pre>
+<pre><code>##                     0         M.daubentonii              M.myotis 
+##               0.00000              20.45455               0.00000 
+## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
+##               0.00000              68.18182               0.00000 
+##                   Pip          Pip.nathusii          Pip.pygmaeus 
+##               0.00000               0.00000               0.00000 
+##          Plec.auritus 
+##              11.36364</code></pre>
+</div>
 </div>
 </div>
 
