@@ -6,21 +6,22 @@ output:
     toc: true
     theme: journal
     number_sections: true
+    fig_caption: true
+    fig_width: 7
+    fig_height: 6
   pdf_document:
     toc: true
     number_sections: true
   md_document:
     toc: true      
     variant: markdown_github
-    fig_width: 7
-    fig_height: 6
 ---
 
 # Datensätze: gesamt, init und monitoring
 
-Zuerst müssen wir die Gesamttabelle einlesen und die Datentypen gemäß werte.csv korrigieren.
 
 ```{r}
+# Zuerst müssen wir die Gesamttabelle einlesen und die Datentypen gemäß werte.csv korrigieren.
 gesamt <- read.csv("gesamttabelle.csv", header=T)
 
 # korrigiere Datentypen
@@ -41,32 +42,35 @@ init  <- subset(gesamt, koa == 10)
 monitoring  <- subset(gesamt, koa != 10)
 ```
 
-# Welche Arten haben ihre Sommerquartiere im Untersuchungsgebiet?
+Es liegen drei Datensätze vor:
 
-Hierfür brauchen wir Datensätze, die nur die Zeilen enthalten, in denen eine Art bestimmt wurde.
+* __gesamt__ umfasst alle Kontrolldaten von 2010 bis 2015
+* __init__ umfasst die Daten von der initialen Untersuchung 2010 (gesamtes Untersuchungsgebiet)
+* __monitoring__ umfasst die Daten aus dem Monitoring (2011 bis 2015), in welchem einige Gebiete zweimal einige nur einmal untersucht, wenige nicht vollständig wurden.
+
+Um die Bestandsentwicklung beurteilen zu können, wird ein Korrekturfaktor 
+`corr <- length(init$kid) / length(monitoring$kid)`
+für die Differenz-Daten, die nach der Formel __diff = corr * (monitoring - init)__ aus den Auswertungsdaten gebildet werden, so realistisch wie möglich darzustellen.
 
 ```{r}
+corr <- length(init$kid) / length(monitoring$kid)
+```
+
+# Welche Arten haben ihre Sommerquartiere im Untersuchungsgebiet?
+
+```{r}
+# Hierfür brauchen wir Datensätze, die nur die Zeilen enthalten, in denen eine Art bestimmt wurde.
 gesamt.flart <- subset(gesamt, flart != 0)
 init.flart <- subset(init, flart != 0)
 monitoring.flart <- subset(monitoring, flart != 0)
 ```
-## insgesamt
-
-### gezählte Individuen pro Art
 
 ```{r}
-print("2010 bis 2015"); summary(gesamt.flart$flart)
-print("2010"); summary(init.flart$flart)
-print("2011 bis 2015"); summary(monitoring.flart$flart)
-```
-### Prozente der gezählten Individuen pro Art
+levels(gesamt.flart$flart)
 
-```{r}
-print("2010 bis 2015"); summary(gesamt.flart$flart) / sum( summary(gesamt.flart$flart) ) * 100
-print("2010"); summary(init.flart$flart) / sum( summary(init.flart$flart) ) * 100
-print("2011 bis 2015"); summary(monitoring.flart$flart) / sum( summary(monitoring.flart$flart) ) * 100
 ```
-2010 wurden sieben Arten gefunden:
+
+Von 2010 bis 2015 wurden acht Arten sowie nicht weiter bestimmte _Pipistrellus_-Arten gefunden:
 
 * Wasserfledermaus (_Myotis daubentonii_)
 * Großes Mausohr (_Myotis myotis_)
@@ -74,44 +78,114 @@ print("2011 bis 2015"); summary(monitoring.flart$flart) / sum( summary(monitorin
 * Fransenfledermaus (_Myotis nattereri_)
 * Großer Abernsegler (_Nyctalus noctula_)
 * Rauhautfledermaus (_Pipistrellus nathusii_)
+* Mückenfledermaus (_Pipistrellus pygmaeus_)
 * Braunes Langohr (_Plecotus auritus_)
 
-Außerdem eine nicht weiter bestimmte _Pipistrellus_-Art.
+## Quartiere pro Art
 
-In der Summe der Folgejahre habe ich nur noch fünf Arten gefunden:
-
-* Wasserfledermuas
-* Großes Mausohr
-* Fransenfledermaus
-* Mückenfledermaus (_Pipistrellus pygmaeus_)
-* Braunes Langohr
-
-Die drei verschwundenen Arten kamen 2010 nur mit ein und zwei Individuen vor, d.h. es kann sich hier um statistische Randeffekte handeln.
-Die deutliche Zunahme der Wasserfledermuas von 3 auf 18 % dürfte ebenfalls eher Zufall sein, da 2010 nur ein Einzeltier gefunden wurde. Ahnliches gilt wohl für Abendsegler, Rauhhaut- und umgekehrt Mückenfledermaus. 
-
-Anders sieht es wohl beim Braunen Langohr aus, das von 27 auf 6 % gefallen ist.
-
-## nur Wochenstuben
-
-```{r}
-gesamt.flart.ws <- subset(gesamt.flart, qtyp == 5)
-init.flart.ws <- subset(init.flart, qtyp == 5)
-monitoring.flart.ws <- subset(monitoring.flart, qtyp == 5)
+```{r Table1, results="asis"}
+gesamt.quartiere <- summary(gesamt.flart$flart)[-1]
+init.quartiere <- summary(init.flart$flart)[-1]
+monitoring.quartiere <- summary(monitoring.flart$flart)[-1]
+diff.quartiere <- corr * (monitoring.quartiere - init.quartiere)
+Quartiere <- data.frame(
+			gesamt.quartiere,
+			init.quartiere,
+			monitoring.quartiere,
+			diff.quartiere
+			)
+names(Quartiere) <- c("gesamt", "init", "monitoring", "diff")
+library(xtable)
+Table1 <- xtable(
+		 Quartiere,
+		 caption="Tabelle 1: Quartiere pro Art",
+		 digits=0
+		 )
+print(Table1, type="html")
 ```
-### gezählte Individuen pro Art
 
-```{r}
-print("2010 bis 2015"); summary(gesamt.flart.ws$flart)
-print("2010"); summary(init.flart.ws$flart)
-print("2011 bis 2015"); summary(monitoring.flart.ws$flart)
-```
-### Prozente der gezählten Individuen pro Art
+Die Quartierverteilung weist auf eine Bestandszunahme bei Wasser- und Fransenfledermaus hin, wobei bei letzerer Doppelzählungen als Zeitreiheneffekte ausschlaggebend sein können. 
 
-```{r}
-print("2010 bis 2015"); summary(gesamt.flart.ws$flart) / sum( summary(gesamt.flart.ws$flart) ) * 100
-print("2010"); summary(init.flart.ws$flart) / sum( summary(init.flart.ws$flart) ) * 100
-print("2011 bis 2015"); summary(monitoring.flart.ws$flart) / sum( summary(monitoring.flart.ws$flart) ) * 100
+## Individuen pro Art
+
+```{r results="asis"}
+# jeweils flart und flges in einem data.frame
+g <- aggregate(gesamt.flart$flges, by=list(flart=gesamt.flart$flart), FUN=sum)
+i <- aggregate(init.flart$flges, by=list(flart=init.flart$flart), FUN=sum)
+m <- aggregate(monitoring.flart$flges, by=list(flart=monitoring.flart$flart), FUN=sum)
+
+# alle beobachteten Arten
+Art <- g$flart
+
+# Die Counts für den Gesamtzeitraum
+count.gesamt <- g$x
+
+# für 2010
+i.1 <- subset(i, flart=="M.daubentonii", select=x)$x
+i.2 <- subset(i, flart=="M.myotis")$x
+i.3 <- subset(i, flart=="M.mystacinus/brandtii")$x
+i.4 <- subset(i, flart=="M.nattereri")$x
+i.5 <- subset(i, flart=="Nyc.noctula")$x
+i.6 <- 0
+i.7 <- subset(i, flart=="Pip.nathusii")$x
+i.8 <- 0
+i.9 <- subset(i, flart=="Plec.auritus")$x
+count.init <- c(i.1,i.2,i.3,i.4,i.5,i.6,i.7,i.8,i.9)
+
+# für 2011 bis 2015
+m.1 <- subset(m, flart=="M.daubentonii")$x
+m.2 <- subset(m, flart=="M.myotis")$x
+m.3 <- 0
+m.4 <- subset(m, flart=="M.nattereri")$x
+m.5 <- 0
+m.6 <- subset(m, flart=="Pip")$x
+m.7 <- 0
+m.8 <- subset(m, flart=="Pip.pygmaeus")$x
+m.9 <- subset(m, flart=="Plec.auritus")$x
+count.monitoring <- c(m.1,m.2,m.3,m.4,m.5,m.6,m.7,m.8,m.9)
+
+# Bestandsentwicklung
+count.diff <- corr * (count.monitoring - count.init)
+
+# alles in einem data.frame
+Art.count <- data.frame(Art, count.gesamt, count.init, count.monitoring, count.diff)
+names(Art.count) <- c("Art","gesamt", "init", "monitoring", "diff")
+Table2 <- xtable(
+		 Art.count,
+		 caption="Tabelle 2: gezählte Individuen pro Art",
+		 digits=0
+		 )
+print(Table2, type="html")
+
+# und die Prozente ...
+
+# Die Prozente ermitteln sich durch den Vector dividiert durch einen Vector der selben Länge, der nur die Vectorsumme enthält.
+percent.gesamt <- count.gesamt / rep(sum(count.gesamt), length(count.gesamt)) *100
+percent.init <- count.init / rep(sum(count.init), length(count.init)) *100
+percent.monitoring <- count.monitoring / rep(sum(count.monitoring), length(count.monitoring)) *100
+
+# Bestandsentwicklung
+percent.diff <- percent.monitoring - percent.init
+
+# alles in einem data.frame
+Art.percent <- data.frame(Art, percent.gesamt, percent.init, percent.monitoring, percent.diff)
+names(Art.percent) <- c("Art","gesamt", "init", "monitoring", "diff")
+Table3 <- xtable(
+		 Art.percent,
+		 caption="Tabelle 3: Prozente der Arten an den gesamt gezählten Individuen",
+		 digits=c(0, 0, rep(2, 4))
+		 )
+print(Table3, type="html")
 ```
+
+In Tabelle 2 und 3 bestätigt sich das Bild von Tabelle 1. Was jedoch auch deutlich wird ist ein Rückgang des Braunen Langohrs um über 30 Prozent.
+Das kann durchaus ein blöder Zufall sein, da hier nur 3 Quartiere nicht wieder gefunden wurden, aber über vier Jahre hinweg doch eher unwahrscheinlich, angesichts der Tatsache, dass die Wochenstuben sich auch in Teilkolonien aufsplitten.
+
+## Wochenstuben pro Art
+
+Da unser Hauptaugenmerk auf den Wochenstuben liegt betrachten wir die Situation noch einmal separat für selbige.
+
+## Individuen pro Wochenstube
 
 
 ```{r}

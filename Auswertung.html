@@ -90,22 +90,18 @@ img {
 <ul>
 <li><a href="#datensatze-gesamt-init-und-monitoring"><span class="toc-section-number">1</span> Datensätze: gesamt, init und monitoring</a></li>
 <li><a href="#welche-arten-haben-ihre-sommerquartiere-im-untersuchungsgebiet"><span class="toc-section-number">2</span> Welche Arten haben ihre Sommerquartiere im Untersuchungsgebiet?</a><ul>
-<li><a href="#insgesamt"><span class="toc-section-number">2.1</span> insgesamt</a><ul>
-<li><a href="#gezahlte-individuen-pro-art"><span class="toc-section-number">2.1.1</span> gezählte Individuen pro Art</a></li>
-<li><a href="#prozente-der-gezahlten-individuen-pro-art"><span class="toc-section-number">2.1.2</span> Prozente der gezählten Individuen pro Art</a></li>
-</ul></li>
-<li><a href="#nur-wochenstuben"><span class="toc-section-number">2.2</span> nur Wochenstuben</a><ul>
-<li><a href="#gezahlte-individuen-pro-art-1"><span class="toc-section-number">2.2.1</span> gezählte Individuen pro Art</a></li>
-<li><a href="#prozente-der-gezahlten-individuen-pro-art-1"><span class="toc-section-number">2.2.2</span> Prozente der gezählten Individuen pro Art</a></li>
-</ul></li>
+<li><a href="#quartiere-pro-art"><span class="toc-section-number">2.1</span> Quartiere pro Art</a></li>
+<li><a href="#individuen-pro-art"><span class="toc-section-number">2.2</span> Individuen pro Art</a></li>
+<li><a href="#wochenstuben-pro-art"><span class="toc-section-number">2.3</span> Wochenstuben pro Art</a></li>
+<li><a href="#individuen-pro-wochenstube"><span class="toc-section-number">2.4</span> Individuen pro Wochenstube</a></li>
 </ul></li>
 </ul>
 </div>
 
 <div id="datensatze-gesamt-init-und-monitoring" class="section level1">
 <h1><span class="header-section-number">1</span> Datensätze: gesamt, init und monitoring</h1>
-<p>Zuerst müssen wir die Gesamttabelle einlesen und die Datentypen gemäß werte.csv korrigieren.</p>
-<pre class="r"><code>gesamt &lt;- read.csv(&quot;gesamttabelle.csv&quot;, header=T)
+<pre class="r"><code># Zuerst müssen wir die Gesamttabelle einlesen und die Datentypen gemäß werte.csv korrigieren.
+gesamt &lt;- read.csv(&quot;gesamttabelle.csv&quot;, header=T)
 
 # korrigiere Datentypen
 gesamt$gpsr  &lt;- as.double(gesamt$gpsr)
@@ -123,81 +119,28 @@ gesamt$qtyp  &lt;- as.factor(gesamt$qtyp)
 # Subsets für 2010 und 2011 bis 2015
 init  &lt;- subset(gesamt, koa == 10)
 monitoring  &lt;- subset(gesamt, koa != 10)</code></pre>
+<p>Es liegen drei Datensätze vor:</p>
+<ul>
+<li><strong>gesamt</strong> umfasst alle Kontrolldaten von 2010 bis 2015</li>
+<li><strong>init</strong> umfasst die Daten von der initialen Untersuchung 2010 (gesamtes Untersuchungsgebiet)</li>
+<li><strong>monitoring</strong> umfasst die Daten aus dem Monitoring (2011 bis 2015), in welchem einige Gebiete zweimal einige nur einmal untersucht, wenige nicht vollständig wurden.</li>
+</ul>
+<p>Um die Bestandsentwicklung beurteilen zu können, wird ein Korrekturfaktor <code>corr &lt;- length(init$kid) / length(monitoring$kid)</code> für die Differenz-Daten, die nach der Formel <strong>diff = corr * (monitoring - init)</strong> aus den Auswertungsdaten gebildet werden, so realistisch wie möglich darzustellen.</p>
+<pre class="r"><code>corr &lt;- length(init$kid) / length(monitoring$kid)</code></pre>
 </div>
 <div id="welche-arten-haben-ihre-sommerquartiere-im-untersuchungsgebiet" class="section level1">
 <h1><span class="header-section-number">2</span> Welche Arten haben ihre Sommerquartiere im Untersuchungsgebiet?</h1>
-<p>Hierfür brauchen wir Datensätze, die nur die Zeilen enthalten, in denen eine Art bestimmt wurde.</p>
-<pre class="r"><code>gesamt.flart &lt;- subset(gesamt, flart != 0)
+<pre class="r"><code># Hierfür brauchen wir Datensätze, die nur die Zeilen enthalten, in denen eine Art bestimmt wurde.
+gesamt.flart &lt;- subset(gesamt, flart != 0)
 init.flart &lt;- subset(init, flart != 0)
 monitoring.flart &lt;- subset(monitoring, flart != 0)</code></pre>
-<div id="insgesamt" class="section level2">
-<h2><span class="header-section-number">2.1</span> insgesamt</h2>
-<div id="gezahlte-individuen-pro-art" class="section level3">
-<h3><span class="header-section-number">2.1.1</span> gezählte Individuen pro Art</h3>
-<pre class="r"><code>print(&quot;2010 bis 2015&quot;); summary(gesamt.flart$flart)</code></pre>
-<pre><code>## [1] &quot;2010 bis 2015&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##                     0                    16                     5 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##                     1                    74                     1 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##                     1                     2                     2 
-##          Plec.auritus 
-##                    13</code></pre>
-<pre class="r"><code>print(&quot;2010&quot;); summary(init.flart$flart)</code></pre>
-<pre><code>## [1] &quot;2010&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##                     0                     1                     2 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##                     1                    15                     1 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##                     0                     2                     0 
-##          Plec.auritus 
-##                     8</code></pre>
-<pre class="r"><code>print(&quot;2011 bis 2015&quot;); summary(monitoring.flart$flart)</code></pre>
-<pre><code>## [1] &quot;2011 bis 2015&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##                     0                    15                     3 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##                     0                    59                     0 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##                     1                     0                     2 
-##          Plec.auritus 
-##                     5</code></pre>
-</div>
-<div id="prozente-der-gezahlten-individuen-pro-art" class="section level3">
-<h3><span class="header-section-number">2.1.2</span> Prozente der gezählten Individuen pro Art</h3>
-<pre class="r"><code>print(&quot;2010 bis 2015&quot;); summary(gesamt.flart$flart) / sum( summary(gesamt.flart$flart) ) * 100</code></pre>
-<pre><code>## [1] &quot;2010 bis 2015&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##             0.0000000            13.9130435             4.3478261 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##             0.8695652            64.3478261             0.8695652 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##             0.8695652             1.7391304             1.7391304 
-##          Plec.auritus 
-##            11.3043478</code></pre>
-<pre class="r"><code>print(&quot;2010&quot;); summary(init.flart$flart) / sum( summary(init.flart$flart) ) * 100</code></pre>
-<pre><code>## [1] &quot;2010&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##              0.000000              3.333333              6.666667 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##              3.333333             50.000000              3.333333 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##              0.000000              6.666667              0.000000 
-##          Plec.auritus 
-##             26.666667</code></pre>
-<pre class="r"><code>print(&quot;2011 bis 2015&quot;); summary(monitoring.flart$flart) / sum( summary(monitoring.flart$flart) ) * 100</code></pre>
-<pre><code>## [1] &quot;2011 bis 2015&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##              0.000000             17.647059              3.529412 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##              0.000000             69.411765              0.000000 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##              1.176471              0.000000              2.352941 
-##          Plec.auritus 
-##              5.882353</code></pre>
-<p>2010 wurden sieben Arten gefunden:</p>
+<pre class="r"><code>levels(gesamt.flart$flart)</code></pre>
+<pre><code>##  [1] &quot;0&quot;                     &quot;M.daubentonii&quot;        
+##  [3] &quot;M.myotis&quot;              &quot;M.mystacinus/brandtii&quot;
+##  [5] &quot;M.nattereri&quot;           &quot;Nyc.noctula&quot;          
+##  [7] &quot;Pip&quot;                   &quot;Pip.nathusii&quot;         
+##  [9] &quot;Pip.pygmaeus&quot;          &quot;Plec.auritus&quot;</code></pre>
+<p>Von 2010 bis 2015 wurden acht Arten sowie nicht weiter bestimmte <em>Pipistrellus</em>-Arten gefunden:</p>
 <ul>
 <li>Wasserfledermaus (<em>Myotis daubentonii</em>)</li>
 <li>Großes Mausohr (<em>Myotis myotis</em>)</li>
@@ -205,92 +148,695 @@ monitoring.flart &lt;- subset(monitoring, flart != 0)</code></pre>
 <li>Fransenfledermaus (<em>Myotis nattereri</em>)</li>
 <li>Großer Abernsegler (<em>Nyctalus noctula</em>)</li>
 <li>Rauhautfledermaus (<em>Pipistrellus nathusii</em>)</li>
+<li>Mückenfledermaus (<em>Pipistrellus pygmaeus</em>)</li>
 <li>Braunes Langohr (<em>Plecotus auritus</em>)</li>
 </ul>
-<p>Außerdem eine nicht weiter bestimmte <em>Pipistrellus</em>-Art.</p>
-<p>In der Summe der Folgejahre habe ich nur noch fünf Arten gefunden:</p>
-<ul>
-<li>Wasserfledermuas</li>
-<li>Großes Mausohr</li>
-<li>Fransenfledermaus</li>
-<li>Mückenfledermaus (<em>Pipistrellus pygmaeus</em>)</li>
-<li>Braunes Langohr</li>
-</ul>
-<p>Die drei verschwundenen Arten kamen 2010 nur mit ein und zwei Individuen vor, d.h. es kann sich hier um statistische Randeffekte handeln. Die deutliche Zunahme der Wasserfledermuas von 3 auf 18 % dürfte ebenfalls eher Zufall sein, da 2010 nur ein Einzeltier gefunden wurde. Ahnliches gilt wohl für Abendsegler, Rauhhaut- und umgekehrt Mückenfledermaus.</p>
-<p>Anders sieht es wohl beim Braunen Langohr aus, das von 27 auf 6 % gefallen ist.</p>
+<div id="quartiere-pro-art" class="section level2">
+<h2><span class="header-section-number">2.1</span> Quartiere pro Art</h2>
+<pre class="r"><code>gesamt.quartiere &lt;- summary(gesamt.flart$flart)[-1]
+init.quartiere &lt;- summary(init.flart$flart)[-1]
+monitoring.quartiere &lt;- summary(monitoring.flart$flart)[-1]
+diff.quartiere &lt;- corr * (monitoring.quartiere - init.quartiere)
+Quartiere &lt;- data.frame(
+            gesamt.quartiere,
+            init.quartiere,
+            monitoring.quartiere,
+            diff.quartiere
+            )
+names(Quartiere) &lt;- c(&quot;gesamt&quot;, &quot;init&quot;, &quot;monitoring&quot;, &quot;diff&quot;)
+library(xtable)
+Table1 &lt;- xtable(
+         Quartiere,
+         caption=&quot;Tabelle 1: Quartiere pro Art&quot;,
+         digits=0
+         )
+print(Table1, type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.2.1 by xtable 1.7-4 package -->
+<!-- Tue Sep 22 20:14:45 2015 -->
+<table border="1">
+<caption align="bottom">
+Tabelle 1: Quartiere pro Art
+</caption>
+<tr>
+<th>
+</th>
+<th>
+gesamt
+</th>
+<th>
+init
+</th>
+<th>
+monitoring
+</th>
+<th>
+diff
+</th>
+</tr>
+<tr>
+<td align="right">
+M.daubentonii
+</td>
+<td align="right">
+16
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+15
+</td>
+<td align="right">
+7
+</td>
+</tr>
+<tr>
+<td align="right">
+M.myotis
+</td>
+<td align="right">
+5
+</td>
+<td align="right">
+2
+</td>
+<td align="right">
+3
+</td>
+<td align="right">
+0
+</td>
+</tr>
+<tr>
+<td align="right">
+M.mystacinus/brandtii
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-0
+</td>
+</tr>
+<tr>
+<td align="right">
+M.nattereri
+</td>
+<td align="right">
+74
+</td>
+<td align="right">
+15
+</td>
+<td align="right">
+59
+</td>
+<td align="right">
+21
+</td>
+</tr>
+<tr>
+<td align="right">
+Nyc.noctula
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-0
+</td>
+</tr>
+<tr>
+<td align="right">
+Pip
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+</tr>
+<tr>
+<td align="right">
+Pip.nathusii
+</td>
+<td align="right">
+2
+</td>
+<td align="right">
+2
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-1
+</td>
+</tr>
+<tr>
+<td align="right">
+Pip.pygmaeus
+</td>
+<td align="right">
+2
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+</tr>
+<tr>
+<td align="right">
+Plec.auritus
+</td>
+<td align="right">
+13
+</td>
+<td align="right">
+8
+</td>
+<td align="right">
+5
+</td>
+<td align="right">
+-1
+</td>
+</tr>
+</table>
+<p>Die Quartierverteilung weist auf eine Bestandszunahme bei Wasser- und Fransenfledermaus hin, wobei bei letzerer Doppelzählungen als Zeitreiheneffekte ausschlaggebend sein können.</p>
 </div>
+<div id="individuen-pro-art" class="section level2">
+<h2><span class="header-section-number">2.2</span> Individuen pro Art</h2>
+<pre class="r"><code># jeweils flart und flges in einem data.frame
+g &lt;- aggregate(gesamt.flart$flges, by=list(flart=gesamt.flart$flart), FUN=sum)
+i &lt;- aggregate(init.flart$flges, by=list(flart=init.flart$flart), FUN=sum)
+m &lt;- aggregate(monitoring.flart$flges, by=list(flart=monitoring.flart$flart), FUN=sum)
+
+# alle beobachteten Arten
+Art &lt;- g$flart
+
+# Die Counts für den Gesamtzeitraum
+count.gesamt &lt;- g$x
+
+# für 2010
+i.1 &lt;- subset(i, flart==&quot;M.daubentonii&quot;, select=x)$x
+i.2 &lt;- subset(i, flart==&quot;M.myotis&quot;)$x
+i.3 &lt;- subset(i, flart==&quot;M.mystacinus/brandtii&quot;)$x
+i.4 &lt;- subset(i, flart==&quot;M.nattereri&quot;)$x
+i.5 &lt;- subset(i, flart==&quot;Nyc.noctula&quot;)$x
+i.6 &lt;- 0
+i.7 &lt;- subset(i, flart==&quot;Pip.nathusii&quot;)$x
+i.8 &lt;- 0
+i.9 &lt;- subset(i, flart==&quot;Plec.auritus&quot;)$x
+count.init &lt;- c(i.1,i.2,i.3,i.4,i.5,i.6,i.7,i.8,i.9)
+
+# für 2011 bis 2015
+m.1 &lt;- subset(m, flart==&quot;M.daubentonii&quot;)$x
+m.2 &lt;- subset(m, flart==&quot;M.myotis&quot;)$x
+m.3 &lt;- 0
+m.4 &lt;- subset(m, flart==&quot;M.nattereri&quot;)$x
+m.5 &lt;- 0
+m.6 &lt;- subset(m, flart==&quot;Pip&quot;)$x
+m.7 &lt;- 0
+m.8 &lt;- subset(m, flart==&quot;Pip.pygmaeus&quot;)$x
+m.9 &lt;- subset(m, flart==&quot;Plec.auritus&quot;)$x
+count.monitoring &lt;- c(m.1,m.2,m.3,m.4,m.5,m.6,m.7,m.8,m.9)
+
+# Bestandsentwicklung
+count.diff &lt;- corr * (count.monitoring - count.init)
+
+# alles in einem data.frame
+Art.count &lt;- data.frame(Art, count.gesamt, count.init, count.monitoring, count.diff)
+names(Art.count) &lt;- c(&quot;Art&quot;,&quot;gesamt&quot;, &quot;init&quot;, &quot;monitoring&quot;, &quot;diff&quot;)
+Table2 &lt;- xtable(
+         Art.count,
+         caption=&quot;Tabelle 2: gezählte Individuen pro Art&quot;,
+         digits=0
+         )
+print(Table2, type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.2.1 by xtable 1.7-4 package -->
+<!-- Tue Sep 22 20:14:45 2015 -->
+<table border="1">
+<caption align="bottom">
+Tabelle 2: gezählte Individuen pro Art
+</caption>
+<tr>
+<th>
+</th>
+<th>
+Art
+</th>
+<th>
+gesamt
+</th>
+<th>
+init
+</th>
+<th>
+monitoring
+</th>
+<th>
+diff
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td>
+M.daubentonii
+</td>
+<td align="right">
+107
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+106
+</td>
+<td align="right">
+50
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td>
+M.myotis
+</td>
+<td align="right">
+6
+</td>
+<td align="right">
+2
+</td>
+<td align="right">
+4
+</td>
+<td align="right">
+1
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td>
+M.mystacinus/brandtii
+</td>
+<td align="right">
+4
+</td>
+<td align="right">
+4
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-2
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td>
+M.nattereri
+</td>
+<td align="right">
+470
+</td>
+<td align="right">
+118
+</td>
+<td align="right">
+352
+</td>
+<td align="right">
+111
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td>
+Nyc.noctula
+</td>
+<td align="right">
+3
+</td>
+<td align="right">
+3
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-1
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td>
+Pip
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td>
+Pip.nathusii
+</td>
+<td align="right">
+2
+</td>
+<td align="right">
+2
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-1
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td>
+Pip.pygmaeus
+</td>
+<td align="right">
+2
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td>
+Plec.auritus
+</td>
+<td align="right">
+102
+</td>
+<td align="right">
+76
+</td>
+<td align="right">
+26
+</td>
+<td align="right">
+-24
+</td>
+</tr>
+</table>
+<pre class="r"><code># und die Prozente ...
+
+# Die Prozente ermitteln sich durch den Vector dividiert durch einen Vector der selben Länge, der nur die Vectorsumme enthält.
+percent.gesamt &lt;- count.gesamt / rep(sum(count.gesamt), length(count.gesamt)) *100
+percent.init &lt;- count.init / rep(sum(count.init), length(count.init)) *100
+percent.monitoring &lt;- count.monitoring / rep(sum(count.monitoring), length(count.monitoring)) *100
+
+# Bestandsentwicklung
+percent.diff &lt;- percent.monitoring - percent.init
+
+# alles in einem data.frame
+Art.percent &lt;- data.frame(Art, percent.gesamt, percent.init, percent.monitoring, percent.diff)
+names(Art.percent) &lt;- c(&quot;Art&quot;,&quot;gesamt&quot;, &quot;init&quot;, &quot;monitoring&quot;, &quot;diff&quot;)
+Table3 &lt;- xtable(
+         Art.percent,
+         caption=&quot;Tabelle 3: Prozente der Arten an den gesamt gezählten Individuen&quot;,
+         digits=c(0, 0, rep(2, 4))
+         )
+print(Table3, type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.2.1 by xtable 1.7-4 package -->
+<!-- Tue Sep 22 20:14:46 2015 -->
+<table border="1">
+<caption align="bottom">
+Tabelle 3: Prozente der Arten an den gesamt gezählten Individuen
+</caption>
+<tr>
+<th>
+</th>
+<th>
+Art
+</th>
+<th>
+gesamt
+</th>
+<th>
+init
+</th>
+<th>
+monitoring
+</th>
+<th>
+diff
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td>
+M.daubentonii
+</td>
+<td align="right">
+15.35
+</td>
+<td align="right">
+0.49
+</td>
+<td align="right">
+21.59
+</td>
+<td align="right">
+21.10
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td>
+M.myotis
+</td>
+<td align="right">
+0.86
+</td>
+<td align="right">
+0.97
+</td>
+<td align="right">
+0.81
+</td>
+<td align="right">
+-0.16
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td>
+M.mystacinus/brandtii
+</td>
+<td align="right">
+0.57
+</td>
+<td align="right">
+1.94
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+-1.94
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td>
+M.nattereri
+</td>
+<td align="right">
+67.43
+</td>
+<td align="right">
+57.28
+</td>
+<td align="right">
+71.69
+</td>
+<td align="right">
+14.41
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td>
+Nyc.noctula
+</td>
+<td align="right">
+0.43
+</td>
+<td align="right">
+1.46
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+-1.46
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td>
+Pip
+</td>
+<td align="right">
+0.14
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.20
+</td>
+<td align="right">
+0.20
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td>
+Pip.nathusii
+</td>
+<td align="right">
+0.29
+</td>
+<td align="right">
+0.97
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+-0.97
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td>
+Pip.pygmaeus
+</td>
+<td align="right">
+0.29
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.41
+</td>
+<td align="right">
+0.41
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td>
+Plec.auritus
+</td>
+<td align="right">
+14.63
+</td>
+<td align="right">
+36.89
+</td>
+<td align="right">
+5.30
+</td>
+<td align="right">
+-31.60
+</td>
+</tr>
+</table>
+<p>In Tabelle 2 und 3 bestätigt sich das Bild von Tabelle 1. Was jedoch auch deutlich wird ist ein Rückgang des Braunen Langohrs um über 30 Prozent. Das kann durchaus ein blöder Zufall sein, da hier nur 3 Quartiere nicht wieder gefunden wurden, aber über vier Jahre hinweg doch eher unwahrscheinlich, angesichts der Tatsache, dass die Wochenstuben sich auch in Teilkolonien aufsplitten.</p>
 </div>
-<div id="nur-wochenstuben" class="section level2">
-<h2><span class="header-section-number">2.2</span> nur Wochenstuben</h2>
-<pre class="r"><code>gesamt.flart.ws &lt;- subset(gesamt.flart, qtyp == 5)
-init.flart.ws &lt;- subset(init.flart, qtyp == 5)
-monitoring.flart.ws &lt;- subset(monitoring.flart, qtyp == 5)</code></pre>
-<div id="gezahlte-individuen-pro-art-1" class="section level3">
-<h3><span class="header-section-number">2.2.1</span> gezählte Individuen pro Art</h3>
-<pre class="r"><code>print(&quot;2010 bis 2015&quot;); summary(gesamt.flart.ws$flart)</code></pre>
-<pre><code>## [1] &quot;2010 bis 2015&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##                     0                     9                     0 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##                     1                    38                     1 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##                     0                     0                     0 
-##          Plec.auritus 
-##                    11</code></pre>
-<pre class="r"><code>print(&quot;2010&quot;); summary(init.flart.ws$flart)</code></pre>
-<pre><code>## [1] &quot;2010&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##                     0                     0                     0 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##                     1                     8                     1 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##                     0                     0                     0 
-##          Plec.auritus 
-##                     6</code></pre>
-<pre class="r"><code>print(&quot;2011 bis 2015&quot;); summary(monitoring.flart.ws$flart)</code></pre>
-<pre><code>## [1] &quot;2011 bis 2015&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##                     0                     9                     0 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##                     0                    30                     0 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##                     0                     0                     0 
-##          Plec.auritus 
-##                     5</code></pre>
+<div id="wochenstuben-pro-art" class="section level2">
+<h2><span class="header-section-number">2.3</span> Wochenstuben pro Art</h2>
+<p>Da unser Hauptaugenmerk auf den Wochenstuben liegt betrachten wir die Situation noch einmal separat für selbige.</p>
 </div>
-<div id="prozente-der-gezahlten-individuen-pro-art-1" class="section level3">
-<h3><span class="header-section-number">2.2.2</span> Prozente der gezählten Individuen pro Art</h3>
-<pre class="r"><code>print(&quot;2010 bis 2015&quot;); summary(gesamt.flart.ws$flart) / sum( summary(gesamt.flart.ws$flart) ) * 100</code></pre>
-<pre><code>## [1] &quot;2010 bis 2015&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##              0.000000             15.000000              0.000000 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##              1.666667             63.333333              1.666667 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##              0.000000              0.000000              0.000000 
-##          Plec.auritus 
-##             18.333333</code></pre>
-<pre class="r"><code>print(&quot;2010&quot;); summary(init.flart.ws$flart) / sum( summary(init.flart.ws$flart) ) * 100</code></pre>
-<pre><code>## [1] &quot;2010&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##                  0.00                  0.00                  0.00 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##                  6.25                 50.00                  6.25 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##                  0.00                  0.00                  0.00 
-##          Plec.auritus 
-##                 37.50</code></pre>
-<pre class="r"><code>print(&quot;2011 bis 2015&quot;); summary(monitoring.flart.ws$flart) / sum( summary(monitoring.flart.ws$flart) ) * 100</code></pre>
-<pre><code>## [1] &quot;2011 bis 2015&quot;</code></pre>
-<pre><code>##                     0         M.daubentonii              M.myotis 
-##               0.00000              20.45455               0.00000 
-## M.mystacinus/brandtii           M.nattereri           Nyc.noctula 
-##               0.00000              68.18182               0.00000 
-##                   Pip          Pip.nathusii          Pip.pygmaeus 
-##               0.00000               0.00000               0.00000 
-##          Plec.auritus 
-##              11.36364</code></pre>
-</div>
+<div id="individuen-pro-wochenstube" class="section level2">
+<h2><span class="header-section-number">2.4</span> Individuen pro Wochenstube</h2>
 </div>
 </div>
 
