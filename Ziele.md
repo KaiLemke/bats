@@ -15,7 +15,8 @@ Aus der Situation, dass es sich hauptsächlich um Altbestände von Vogelnist- un
 
 * Wie ist der Trend der Quartiersituation? Besteht Handlungsbedarf, wenn ja, in welchem Umfang?
 * Werden bestimmte Kastentypen bevorzugt?
-* Wie interagieren die Nutzung durch Vögel, Säuger und Insekten mit der Nutzung durch Fledermäuse?
+* Wie beeinflusst die Nutzung der Kästen durch Vögel, Säuger und Insekten deren Nutzung durch Fledermäuse?
+* Wie werden die neu aufgehängten Fledermauskästen angenommen?
 
 Aus dem Waldumbau ergeben sich folgende Fragen:
 

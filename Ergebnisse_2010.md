@@ -1,7 +1,7 @@
 # Ergebnisse aus den Auswertungen von 2010 #
 
 Hier werden noch einmal kurz die Ergebnisse aus der Anfangsuntersuchung aufgelistet.
-In den folgenden Auswertungen wird dennoch vergleichend zwischen Gesamtdaten und 2010 analysierta, um Verzerrungen durch unterschiedliche Analysemethoden zu vermeiden und weil aus Zeitgründen die Erfassung von Kästen ohne Kontrolldaten eingestellt wurde und diese deshalb aus dem Datensatz herausgenommen wurden. Dies betrifft vor allem defekte Kästen, die damit nahezu vollständig aus der Erfassung herausfallen.
+In den folgenden Auswertungen wird dennoch vergleichend zwischen Gesamtdaten und 2010 analysiert, um Verzerrungen durch unterschiedliche Analysemethoden zu vermeiden und weil aus Zeitgründen die Erfassung von Kästen ohne Kontrolldaten eingestellt wurde und diese deshalb aus dem Datensatz herausgenommen wurden. Dies betrifft vor allem defekte Kästen, die damit nahezu vollständig aus der Erfassung herausfallen.
 
 ## Statistik ##
 

@@ -7,8 +7,6 @@ output:
     theme: journal
     number_sections: true
     fig_caption: true
-    fig_width: 7
-    fig_height: 6
   pdf_document:
     toc: true
     number_sections: true
@@ -185,8 +183,320 @@ Das kann durchaus ein blöder Zufall sein, da hier nur 3 Quartiere nicht wieder 
 
 Da unser Hauptaugenmerk auf den Wochenstuben liegt betrachten wir die Situation noch einmal separat für selbige.
 
+```{r}
+# nur Daten, die Wochenstuben beinhalten
+gesamt.ws <- subset(gesamt.flart, qtyp == 5)
+init.ws <- subset(init.flart, qtyp == 5)
+monitoring.ws <- subset(monitoring.flart, qtyp == 5)
+```
+
+```{r Table3, results="asis"}
+gesamt.ws.quartiere <- summary(gesamt.ws$flart)[-1]
+init.ws.quartiere <- summary(init.ws$flart)[-1]
+monitoring.ws.quartiere <- summary(monitoring.ws$flart)[-1]
+diff.ws.quartiere <- corr * (monitoring.ws.quartiere - init.ws.quartiere)
+
+Wochenstuben<- data.frame(
+			gesamt.ws.quartiere,
+			init.ws.quartiere,
+			monitoring.ws.quartiere,
+			diff.ws.quartiere
+			)
+names(Wochenstuben) <-  c("gesamt", "init", "monitoring", "diff")
+Table3 <- xtable(
+		 Wochenstuben,
+		 caption="Tabelle 3: Wochenstuben pro Art",
+		 digits=0
+		 )
+print(Table3, type="html")
+```
+
+Das Bild entspricht dem der Quartiere insgesamt.
+
 ## Individuen pro Wochenstube
 
+```{r results="asis"}
+# jeweils flart und flges in einem data.frame
+g <- aggregate(gesamt.ws$flges, by=list(flart=gesamt.ws$flart), FUN=sum)
+i <- aggregate(init.ws$flges, by=list(flart=init.ws$flart), FUN=sum)
+m <- aggregate(monitoring.ws$flges, by=list(flart=monitoring.ws$flart), FUN=sum)
+
+# alle beobachteten Arten
+Art <- g$flart
+
+# Die Counts für den Gesamtzeitraum
+count.gesamt <- g$x
+
+# für 2010
+i.1 <- 0
+i.2 <- subset(i, flart=="M.mystacinus/brandtii")$x
+i.3 <- subset(i, flart=="M.nattereri")$x
+i.4 <- subset(i, flart=="Nyc.noctula")$x
+i.5 <- subset(i, flart=="Plec.auritus")$x
+count.init <- c(i.1,i.2,i.3,i.4,i.5)
+
+# für 2011 bis 2015
+m.1 <- subset(m, flart=="M.daubentonii")$x
+m.2 <- 0
+m.3 <- subset(m, flart=="M.nattereri")$x
+m.4 <- 0
+m.5 <- subset(m, flart=="Plec.auritus")$x
+count.monitoring <- c(m.1,m.2,m.3,m.4,m.5)
+
+# Bestandsentwicklung
+count.diff <- corr * (count.monitoring - count.init)
+
+# alles in einem data.frame
+Art.count <- data.frame(Art, count.gesamt, count.init, count.monitoring, count.diff)
+names(Art.count) <- c("Art","gesamt", "init", "monitoring", "diff")
+Table4 <- xtable(
+		 Art.count,
+		 caption="Tabelle 4: gezählte Individuen pro Art in den Wochenstuben",
+		 digits=0
+		 )
+print(Table4, type="html")
+
+# und die Prozente ...
+
+# Die Prozente ermitteln sich durch den Vector dividiert durch einen Vector der selben Länge, der nur die Vectorsumme enthält.
+percent.gesamt <- count.gesamt / rep(sum(count.gesamt), length(count.gesamt)) *100
+percent.init <- count.init / rep(sum(count.init), length(count.init)) *100
+percent.monitoring <- count.monitoring / rep(sum(count.monitoring), length(count.monitoring)) *100
+
+# Bestandsentwicklung
+percent.diff <- percent.monitoring - percent.init
+
+# alles in einem data.frame
+Art.percent <- data.frame(Art, percent.gesamt, percent.init, percent.monitoring, percent.diff)
+names(Art.percent) <- c("Art","gesamt", "init", "monitoring", "diff")
+Table5 <- xtable(
+		 Art.percent,
+		 caption="Tabelle 5: Prozente der Arten an den in den Wochenstuben gezählten Individuen",
+		 digits=c(0, 0, rep(2, 4))
+		 )
+print(Table5, type="html")
+```
+
+Auch hier exakt das gleiche Bild wie bei allen Quartiertypen.
+
+# Wo sind die Verbreitungsschwerpunkte?
+
+Als geographische Anhaltspunkte dienen uns hier die Forst-Schläge.
+In 15 Schlägen wurden Fledermausquartiere gefunden:
+
+```{r Table6, results="asis"}
+# Die Anzahl der Quartiere entspricht der Anzahl von Fledermausfunden, daher, können wir mit den Datensätzen arbeiten.
+gesamt.schlag <- summary(gesamt.flart$schlag, na.rm=T)
+init.schlag <- summary(init.flart$schlag, na.rm=T)
+monitoring.schlag <- summary(monitoring.flart$schlag, na.rm=T)
+diff.schlag <- corr * (monitoring.schlag - init.schlag)
+
+kuerzel <- names(gesamt.schlag)
+schlag <- c(
+	    "Buchbeg",
+	    "Blaues Kreuz",
+	    "Eberhard",
+	    "Großholz",
+	    "Höckenbach",
+	    "Hochgementel",
+	    "Herr König",
+	    "Höger Zaun",
+	    "Kirchenholz",
+	    "Klemmtaferl",
+	    "Klosterhau",
+	    "Mitterbachl",
+	    "Rotes Kreuz",
+	    "Schöngraben",
+	    "Sulzschlag"
+	    )
+Schlag <- data.frame(
+		     kuerzel,
+		     schlag
+		     )
+Table6 <- xtable(
+		 Schlag,
+		 caption="Tabelle 6: Abkürzungen für die Schläge",
+		 digits=0
+		 )
+print(Table6, type="html")
+```
+
+```{r Fig.1, fig.width=7, fig.height=9, fig.cap="Abb. 1: Quartiere pro Schlag", results="asis"}
+par(mfrow=c(3,1))
+plot(gesamt.flart$schlag,
+     main="gesamt",
+     ylim=c(0,20)
+     )
+plot(
+     init.flart$schlag,
+     main="2010",
+     ylim=c(0,20)
+     )
+plot(monitoring.flart$schlag,
+     main="2011 bis 2015",
+     ylim=c(0,20)
+     )
+```
+
+```{r Fig.2, fig.width=7, fig.height=9, fig.cap="Abb. 2: Individuen pro Schlag", results="asis"}
+g <- aggregate(gesamt.flart$flges, by=list(schlag=gesamt.flart$schlag), FUN=sum)
+i <- aggregate(init.flart$flges, by=list(schlag=init.flart$schlag), FUN=sum)
+m <- aggregate(monitoring.flart$flges, by=list(schlag=monitoring.flart$schlag), FUN=sum)
+Schlag <- g$schlag
+count.gesamt <- g$x
+count.init <- c(i$x[1],0,i$x[2:8],0,i$x[9:11])
+count.monitoring <- c(m$x[1:3],0,m$x[4:12])
+count.diff <- corr * (count.monitoring - count.init)
+Schlag.count <- data.frame(Schlag, count.gesamt, count.init, count.monitoring, count.diff)
+names(Schlag.count) <- c("Schlag", "gesamt", "init", "monitoring", "diff")
+
+par(mfrow=c(3,1))
+plot(
+     Schlag.count$gesamt ~ Schlag.count$Schlag,
+     main="gesamt",
+     xlab="Schlag",
+     ylab="gezählte Individuen"
+     )
+plot(
+     Schlag.count$init ~ Schlag.count$Schlag,
+     main="init",
+     xlab="Schlag",
+     ylab="gezählte Individuen"
+     )
+plot(
+     Schlag.count$monitoring ~ Schlag.count$Schlag,
+     main="monitoring",
+     xlab="Schlag",
+     ylab="gezählte Individuen"
+     )
+```
+
+Abbildung 1 und 2 lassen keine deutliche Bevorzugung einzelner Schläge erkennen, außer vielleicht, den Komplex Rotem Kreuz / Mitterbachl und dem Klemmtaferl. Bei ersterem wäre die naheliegendste These zur Erklärung der höheren Individuendichte, das Vorhandensein von Gewässern.
+Dies bedeutet allerdings nicht, dass es keine Effekte gibt, da die Schläge nur ein mäßiges Mittel zur Beantwortung dieser Frage sind.
+Besser wäre sicherlich eine Darstellung mit einem Geoinformationssystem, insbesondere mit Überlagerung der Waldstruktur, die sich freilich nicht an die Grenzen der Schläge hält.
+
+Desweiteren können natürlich andere Effekte Standorteffekte überlagern; ein möglicher Einflussfaktor ist die Anzahl der Kästen pro Schlag, welcher als nächstes untersucht wird.
+
+```{r Fig.3, fig.width=9, fig.height=9, fig.cap="Abb. 3: Prozentuale Nutzung der Kästen in Abhängigkeit von der Anzahl der Kästen pro Schlag", results="asis"}
+g.g <- summary(na.exclude(gesamt$schlag))
+i.g <- summary(na.exclude(init$schlag))
+m.g <- summary(na.exclude(monitoring$schlag))
+m.f <- summary(na.exclude(monitoring.flart$schlag))
+m.p <- m.f / m.g * 100
+d.g <- corr * (m.g - i.g)
+
+g.f <- summary(na.exclude(gesamt.flart$schlag))
+g.p <- g.f / g.g * 100
+i.f <- summary(na.exclude(init.flart$schlag))
+i.p <- i.f / i.g * 100
+d.f <- corr * (m.f - i.f)
+d.p <- d.f / d.g * 100
+
+a <- lm(g.p ~ g.g)
+b <- lm(i.p ~ i.g)
+c <- lm(m.p ~ m.g)
+
+par(mfrow=c(2,2))
+plot(
+     g.p ~ g.g, 
+     main="gesamt",
+     xlab="Kästen pro Schlag",
+     ylab="genutzte % der Kästen pro Schlag"
+     )
+abline(a)
+plot(
+     i.p ~ i.g, 
+     main="init",
+     xlab="Kästen pro Schlag",
+     ylab="genutzte % der Kästen pro Schlag"
+     )
+abline(b)
+plot(
+     m.p ~ m.g, 
+     main="monitoring",
+     xlab="Kästen pro Schlag",
+     ylab="genutzte % der Kästen pro Schlag"
+     )
+abline(c)
+```
+
+```{r Fig.4, fig.width=9, fig.height=9, fig.cap="Abb. 4: Summe der Individuen in Abhängigkeit von der Anzahl der Kästen pro Schlag", results="asis"}
+# Summe der Indiviuden pro Schlag
+g.b <- aggregate(gesamt$flges, by=list(schlag=gesamt$schlag), FUN=sum)
+i.b <- aggregate(init$flges, by=list(schlag=init$schlag), FUN=sum)
+m.b <- aggregate(monitoring$flges, by=list(schlag=monitoring$schlag), FUN=sum)
+
+# als Verktoren mit benannten Levels
+g.bx <- g.b$x
+names(g.bx) <- g.b$schlag
+i.bx <- i.b$x
+names(i.bx) <- i.b$schlag
+m.bx <- m.b$x
+names(m.bx) <- m.b$schlag
+
+# Zuordnung: Individuenb pro schlag zu Kästen pro Schlag
+library(plyr)
+
+g.b <- rbind.fill.matrix(t(g.g), t(g.bx))
+rownames(g.b) <- c("Kästen", "Individuen")
+g.b[is.na(g.b)] <- 0
+i.b <- rbind.fill.matrix(t(i.g), t(i.bx))
+rownames(i.b) <- c("Kästen", "Individuen")
+i.b[is.na(i.b)] <- 0
+m.b <- rbind.fill.matrix(t(m.g), t(m.bx))
+rownames(m.b) <- c("Kästen", "Individuen")
+m.b[is.na(m.b)] <- 0
+
+a <- lm(g.b[2,] ~ g.b[1,])
+b <- lm(i.b[2,] ~ i.b[1,])
+c <- lm(m.b[2,] ~ m.b[1,])
+
+par(mfrow=c(2,2))
+plot(
+     g.b[2,] ~ g.b[1,], 
+     main="gesamt",
+     xlab="Kästen",
+     ylab="Individuen"
+     )
+abline(a)
+plot(
+     i.b[2,] ~ i.b[1,], 
+     main="init",
+     xlab="Kästen",
+     ylab="Individuen"
+     )
+abline(b)
+plot(
+     m.b[2,] ~ m.b[1,],
+     main="monitoring",
+     xlab="Kästen",
+     ylab="Individuen"
+     )
+abline(c)
+```
+
+```{r}
+summary(a)
+summary(b)
+summary(c)
+```
+
+Während die Anzahl der Quartiere pro Schlag weitgehend unabhängig von der Anzahl der Kästen pro Schlag scheint, zeigt sich, dass die Anzahl der Individuen pro Schlag signifikant (0.002 < p < 0.005) mit zunehmender Kastenzahl steigt (df=13).
+
+# Wie steht es um Quantität und Qualität der künstlichen Quartiere?
+
+```{r Tab.7, results="asis"}
+Schlag <- data.frame(g.g, i.g, m.g, d.g)
+names(Schlag) <- c("gesamt", "init", "monitoring", "diff")
+
+Table7 <- xtable(
+		 Schlag,
+		 caption="Tabelle 7: Anzahl der Kästen pro Schlag",
+		 digits=0
+		 )
+print(Table7, type="html")
+```
+Hier möchte ich eine Darstellung für jedes Kontrolljahr!
 
 ```{r}
 ```
