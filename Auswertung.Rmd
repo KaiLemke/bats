@@ -176,8 +176,8 @@ Table3 <- xtable(
 print(Table3, type="html")
 ```
 
-In Tabelle 2 und 3 bestätigt sich das Bild von Tabelle 1. Was jedoch auch deutlich wird ist ein Rückgang des Braunen Langohrs um über 30 Prozent.
-Das kann durchaus ein blöder Zufall sein, da hier nur 3 Quartiere nicht wieder gefunden wurden, aber über vier Jahre hinweg doch eher unwahrscheinlich, angesichts der Tatsache, dass die Wochenstuben sich auch in Teilkolonien aufsplitten.
+In Tabelle 2 und 3 bestätigt sich das Bild von Tabelle 1. Was jedoch auch deutlich wird, ist ein Rückgang des Braunen Langohrs um über 30 Prozent.
+Das kann durchaus ein blöder Zufall sein, da hier nur 3 Quartiere nicht wieder gefunden wurden, aber über vier Jahre hinweg doch eher unwahrscheinlich angesichts der Tatsache, dass die Wochenstuben sich auch in Teilkolonien aufsplitten.
 
 ## Wochenstuben pro Art
 
@@ -371,11 +371,11 @@ plot(
      )
 ```
 
-Abbildung 1 und 2 lassen keine deutliche Bevorzugung einzelner Schläge erkennen, außer vielleicht, den Komplex Rotem Kreuz / Mitterbachl und dem Klemmtaferl. Bei ersterem wäre die naheliegendste These zur Erklärung der höheren Individuendichte, das Vorhandensein von Gewässern.
-Dies bedeutet allerdings nicht, dass es keine Effekte gibt, da die Schläge nur ein mäßiges Mittel zur Beantwortung dieser Frage sind.
+Abbildung 1 und 2 lassen keine deutliche Bevorzugung einzelner Schläge erkennen, außer vielleicht, den Komplex Rotes Kreuz / Mitterbachl und dem Klemmtaferl. Bei ersterem wäre die naheliegendste These zur Erklärung der höheren Individuendichte, das Vorhandensein von Gewässern.
+Da die Schläge nur ein mäßiges Mittel zur Beantwortung dieser Frage sind, kann es gut sein, dass vorhandene Effekte mit dieser Methode nicht aufgezeigt werden können.
 Besser wäre sicherlich eine Darstellung mit einem Geoinformationssystem, insbesondere mit Überlagerung der Waldstruktur, die sich freilich nicht an die Grenzen der Schläge hält.
 
-Desweiteren können natürlich andere Effekte Standorteffekte überlagern; ein möglicher Einflussfaktor ist die Anzahl der Kästen pro Schlag, welcher als nächstes untersucht wird.
+Desweiteren können andere Effekte Standorteffekte überlagern; ein möglicher Einflussfaktor ist die Anzahl der Kästen pro Schlag, welcher als nächstes untersucht wird.
 
 ```{r Fig.3, fig.width=9, fig.height=9, fig.cap="Abb. 3: Prozentuale Nutzung der Kästen in Abhängigkeit von der Anzahl der Kästen pro Schlag", results="asis"}
 g.g <- summary(na.exclude(gesamt$schlag))
@@ -483,20 +483,38 @@ summary(c)
 
 Während die Anzahl der Quartiere pro Schlag weitgehend unabhängig von der Anzahl der Kästen pro Schlag scheint, zeigt sich, dass die Anzahl der Individuen pro Schlag signifikant (0.002 < p < 0.005) mit zunehmender Kastenzahl steigt (df=13).
 
+Es können also maximal geringe geographische Präferenzen beobachtet werden, dafür aber eine positiv-lineare Beziehung zwischen Kastendichte und Individuendichte. 
+Dieser Zusammenhang bedeutet, dass sich die Population durch das Aufhängen neuer Kästen stärken lässt, aber auch, dass sie sinken wird, wenn die Kastdichte aufgrund des hohen Alters vieler Kästen abnimmt.
+
 # Wie steht es um Quantität und Qualität der künstlichen Quartiere?
 
 ```{r Tab.7, results="asis"}
-Schlag <- data.frame(g.g, i.g, m.g, d.g)
-names(Schlag) <- c("gesamt", "init", "monitoring", "diff")
+# Subsets für jedes Jahr
+anno10 <- subset(gesamt, koa == 10)
+anno11 <- subset(gesamt, koa == 11)
+anno12 <- subset(gesamt, koa == 12)
+anno13 <- subset(gesamt, koa == 13)
+anno14 <- subset(gesamt, koa == 14)
+anno15 <- subset(gesamt, koa == 15)
+
+# Anzahl der gefundenen Kästen pro Jahr
+schlag10 <- summary(na.exclude(anno10$schlag))
+schlag11 <- summary(na.exclude(anno11$schlag))
+schlag12 <- summary(na.exclude(anno12$schlag))
+schlag13 <- summary(na.exclude(anno13$schlag))
+schlag14 <- summary(na.exclude(anno14$schlag))
+schlag15 <- summary(na.exclude(anno15$schlag))
+
+Schlag <- data.frame(g.g, schlag10, schlag11, schlag12, schlag13, schlag14, schlag15)
+names(Schlag) <- c("gesamt", "2010", "2011", "2012", "2013", "2014", "2015")
 
 Table7 <- xtable(
 		 Schlag,
-		 caption="Tabelle 7: Anzahl der Kästen pro Schlag",
+		 caption="Tabelle 7: Anzahl der Kästen pro Schlag und Jahr",
 		 digits=0
 		 )
 print(Table7, type="html")
 ```
-Hier möchte ich eine Darstellung für jedes Kontrolljahr!
 
 ```{r}
 ```

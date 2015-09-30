@@ -1,0 +1,114 @@
+---
+title: "Auswertung v1"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    toc: true
+    theme: journal
+    number_sections: true
+    fig_caption: true
+  pdf_document:
+    toc: true
+    number_sections: true
+  md_document:
+    toc: true      
+    variant: markdown_github
+---
+
+```{r libs}
+library(xtable)
+library(plyr)
+```
+
+# Datensätze
+
+Die Auswertungen erfolgen für den gesamten Datensatz (**df**) sowie für jedes Kontrolljahr einzeln (**df10 bis df15**).
+Dabei ist zu beachten, dass 2010 das gesamte Untersuchungsgebiet kontrolliert wurde,
+da es sich um eine bezahlte Studie handelte;
+in den Folgejahren wurde das Projekt als rein ehrenamtliches Monitoring weitergeführt,
+daher konnten aus Zeitgründen nur Teilgebiete untersucht werden.
+
+```{r data.1}
+source("Auswertung/read.R")
+```
+
+Einen Überblick über den Umfang der Kontrollen in den einzelnen Jahren geben die Kontrollierten Schläge.
+
+```{r data.2}
+tab.schlag <- with(df, table(schlag, koa))
+m.schlag <- as.data.frame.matrix(tab.schlag)
+m.schlag <- rbind(m.schlag, Summe=colSums(m.schlag))
+m.schlag <- cbind(m.schlag, gesamt=rowSums(m.schlag))
+```
+
+```{r tab.1, results="asis"}
+Table1 <- xtable(
+		 m.schlag,
+		 caption="Tabelle 1: Datensätze pro Schlag",
+		 digits=0
+		 )
+print(Table1, type="html")
+```
+
+# Welche Arten haben ihre Sommerquartiere im Untersuchungsgebiet?
+
+```{r list.2}
+levels(df$flart)
+```
+
+Von 2010 bis 2015 wurden acht Arten sowie nicht weiter bestimmte _Pipistrellus_-Arten gefunden:
+
+* Wasserfledermaus (_Myotis daubentonii_)
+* Großes Mausohr (_Myotis myotis_)
+* Bartfledermäuse (_Myotis mystacinus_ oder _Myotis brandtii_)
+* Fransenfledermaus (_Myotis nattereri_)
+* Großer Abernsegler (_Nyctalus noctula_)
+* Rauhautfledermaus (_Pipistrellus nathusii_)
+* Mückenfledermaus (_Pipistrellus pygmaeus_)
+* Braunes Langohr (_Plecotus auritus_)
+
+```{r data.3}
+tab.art <- with(df, table(flart, koa))
+m.art <- as.data.frame.matrix(tab.art)
+m.art <- m.art[-1,]
+m.art <- rbind(m.art, Summe=colSums(m.art))
+m.art <- cbind(m.art, gesamt=rowSums(m.art))
+```
+
+```{r tab.2, results="asis"}
+Table2 <- xtable(
+		 m.art,
+		 caption="Tabelle 2: Quartiere pro Art",
+		 digits=0
+		 )
+print(Table2, type="html")
+```
+```{r data.4}
+df.ind.art <- ddply(df, .(koa, flart), summarise, Individuen = sum(flges))
+```
+
+```{r fig.1, fig.width=9, fig.height=18, fig.cap="Abb. 1: Individuen pro Art"}
+par(mfrow=c(7,1))
+for(i in 10:15){
+	with(
+	     subset(df.ind.art, koa == i),
+	     plot(Individuen ~ flart, 
+		  main=paste0("20", i),
+		  ylim=c(0,140)
+		  )
+	     )
+}
+with(df.ind.art,
+     plot(Individuen ~ flart,
+	  main="gesamt")
+     )
+```
+
+Die Wasserfledermaus (**Myotis daubentonii**), die 2010 nur mit einem Individuum beobachtet wurde, scheint weitaus häufiger zu sein. 
+Da die Schwankungen in den Zählergebnissen nicht mit denen in den Gebieten Rotes Kreuz / Mitterbachl, die offenes Wasser bieten, übereinstimmen, ist von einer methodischen Zählungenauigkeit auszugehen.
+Die Fransenfledermaus (**Myotis nattereri**) ist nach wie vor die dominierende Art im Feilenforst.
+Leider lässt sich beim Braunen Langohr (**Plecotus auritus**) eine deutlicher Rückgang in der Quartierzahl verzeichnen.
+Es kann sein, dass 2010 ein Ausreißer nach oben war, es kann immer noch Zählungenauigkeit sein, aber es ist ein deutlicher Rückgang zu befürchten.
+
+```{r}
+```
