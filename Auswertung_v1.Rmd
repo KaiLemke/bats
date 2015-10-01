@@ -10,13 +10,14 @@ output:
   pdf_document:
     toc: true
     number_sections: true
+    fig_caption: true
   md_document:
     toc: true      
     variant: markdown_github
 ---
 
 ```{r libs}
-library(xtable)
+library(pander)
 library(plyr)
 ```
 
@@ -41,18 +42,19 @@ m.schlag <- rbind(m.schlag, Summe=colSums(m.schlag))
 m.schlag <- cbind(m.schlag, gesamt=rowSums(m.schlag))
 ```
 
-```{r tab.1, results="asis"}
-Table1 <- xtable(
+```{r tab.1}
+Table1 <- pander(
 		 m.schlag,
-		 caption="Tabelle 1: Datensätze pro Schlag",
+		 caption="Datensätze pro Schlag",
+
 		 digits=0
 		 )
-print(Table1, type="html")
+Table1
 ```
 
 # Welche Arten haben ihre Sommerquartiere im Untersuchungsgebiet?
 
-```{r list.2}
+```{r list.1}
 levels(df$flart)
 ```
 
@@ -75,19 +77,20 @@ m.art <- rbind(m.art, Summe=colSums(m.art))
 m.art <- cbind(m.art, gesamt=rowSums(m.art))
 ```
 
-```{r tab.2, results="asis"}
-Table2 <- xtable(
+```{r tab.2}
+Table2 <- pander(
 		 m.art,
-		 caption="Tabelle 2: Quartiere pro Art",
-		 digits=0
+		 caption="Quartiere pro Art",
+		 digits=0,
+		 split.table=Inf
 		 )
-print(Table2, type="html")
+Table2
 ```
 ```{r data.4}
 df.ind.art <- ddply(df, .(koa, flart), summarise, Individuen = sum(flges))
 ```
 
-```{r fig.1, fig.width=9, fig.height=18, fig.cap="Abb. 1: Individuen pro Art"}
+```{r fig.1, fig.width=9, fig.height=18, fig.cap="Individuen pro Art"}
 par(mfrow=c(7,1))
 for(i in 10:15){
 	with(
@@ -100,7 +103,9 @@ for(i in 10:15){
 }
 with(df.ind.art,
      plot(Individuen ~ flart,
-	  main="gesamt")
+	  main="gesamt",
+	  ylim=c(0,140)
+	  )
      )
 ```
 
@@ -109,6 +114,126 @@ Da die Schwankungen in den Zählergebnissen nicht mit denen in den Gebieten Rote
 Die Fransenfledermaus (**Myotis nattereri**) ist nach wie vor die dominierende Art im Feilenforst.
 Leider lässt sich beim Braunen Langohr (**Plecotus auritus**) eine deutlicher Rückgang in der Quartierzahl verzeichnen.
 Es kann sein, dass 2010 ein Ausreißer nach oben war, es kann immer noch Zählungenauigkeit sein, aber es ist ein deutlicher Rückgang zu befürchten.
+
+# Wo sind die Verbreitungsschwerpunkte?
+
+Als geographische Anhaltspunkte dienen uns hier die von oben bereits bekannten Forst-Schläge.
+
+```{r data.5}
+tab.q.schlag <- with(
+		   subset(
+			  df,
+			  qtyp != 0
+			  ),
+		   table(schlag, koa))
+m.q.schlag <- as.data.frame.matrix(tab.q.schlag)
+m.q.schlag <- rbind(m.q.schlag, Summe=colSums(m.q.schlag))
+m.q.schlag <- cbind(m.q.schlag, gesamt=rowSums(m.q.schlag))
+```
+
+```{r tab.3}
+Table3 <- pander(
+		 m.q.schlag,
+		 caption="Quartiere pro Schlag",
+		 digits=0
+		 )
+Table3
+```
+
+```{r data.6}
+df.art.schlag <- ddply(df, .(koa, schlag), summarise, Individuen = sum(flges))
+```
+
+```{r fig.2, fig.width=9, fig.height=18, fig.cap="Individuen pro Schlag"}
+par(mfrow=c(7,1))
+for(i in 10:15){
+	with(
+	     subset(df.art.schlag, koa == i),
+	     plot(Individuen ~ schlag, 
+		  main=paste0("20", i),
+		  ylim=c(0,100)
+		  )
+	     )
+}
+with(df.art.schlag,
+     plot(Individuen ~ schlag,
+	  main="gesamt",
+	  ylim=c(0,100)
+	  )
+     )
+```
+
+```{r data.7}
+v.kasten.schlag <- rep(0, length(df.art.schlag$Individuen))
+for(
+    i in seq_along(v.kasten.schlag)
+    ){
+	v.kasten.schlag[i] <- m.schlag[
+				       paste0(df.art.schlag$schlag[i]), 
+				       paste0(df.art.schlag$koa[i])
+				       ]
+}
+df.kasten.art.schlag <- df.art.schlag
+df.kasten.art.schlag$Kastenzahl <- v.kasten.schlag
+df.kasten.art.schlag$IndProKasten <- with(df.kasten.art.schlag,
+					  Individuen / Kastenzahl
+					  )
+```
+
+```{r fig.3, fig.width=9, fig.height=5, fig.cap="Kästen pro Schlag"}
+with(df.kasten.art.schlag,
+	     plot(Kastenzahl ~ schlag,
+		  main="gesamt"
+		  )
+     )
+```
+
+```{r fig.4, fig.width=9, fig.height=5, fig.cap="Individuen pro Kasten und Schlag"}
+with(df.kasten.art.schlag,
+     plot(IndProKasten ~ schlag,
+	  main="gesamt"
+	  )
+     )
+```
+
+```{r fig.5, fig.width=9, fig.height=5, fig.cap="Individuen pro Kasten"}
+with(df.kasten.art.schlag,
+     {
+	     plot(Individuen ~ Kastenzahl,
+		  main="gesamt"
+		  )
+	     abline(lm(Individuen ~ Kastenzahl))
+     }
+     )
+```
+
+Sowohl bei den Quartieren (Tabelle 3) als auch bei den Individuenzahlen (Abb. 2) zeigt sich eine Häufung in einer Reihe von Schlägen, die auf der Karte betrachtet weitgehend zusammenhängen. Bei näherer Betrachtung zeigt sich jedoch, dass dort auch die Kastendichte höher ist (Abb. 3).
+Die Abbildungen 4 und 5 legen nahe, dass sowohl die Schläge an sich relevant sind, da sich die durchschnittliche Individuenzahl pro Kasten unterscheidet, 
+als auch die Kastendichte.
+
+```{r data.8}
+model1 <- aov(Individuen ~ Kastenzahl + schlag, data=df.kasten.art.schlag)
+```
+
+```{r tab.4}
+Table4 <- pander(
+		 model1,
+		 caption="ANOVA: Individuen ~ Kastenzahl + Schlag"
+		 )
+Table4
+```
+
+```{r fig.6, fig.width=9, fig.height=9, fig.cap="Modellkritik Tabelle 4", warning=F}
+par(mfrow=c(2,2))
+plot(model1)
+```
+Die ANOVA zeigt, dass eine positiv lineare Beziehung zwischen Kastendichte und Individuendichte (p = 5.99 * e^-1) besteht und darüber hinaus einer ebenfalls hochsignifikanter, aber weitaus schwächerer (p = 0.04) Unterschied zwischen den Schlägen.
+
+Für den Bereich Rotes Kreuz / Mitterbachl dürften die Offenwasserflächen relevant sein, da diese ein gutes Nahrungsangebot generieren,
+für die Bereiche südlich der B300 dürfte die Nähe zu diesen relevant sein.
+Zudem bilden die bevorzugten Bereiche den Kern des Forstes mit seiner größten Ausdehnung.
+
+# Wie steht es um Quantität und Qualität der künstlichen Quartiere?
 
 ```{r}
 ```
