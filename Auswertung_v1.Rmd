@@ -212,12 +212,12 @@ Die Abbildungen 4 und 5 legen nahe, dass sowohl die Schläge an sich relevant si
 als auch die Kastendichte.
 
 ```{r data.8}
-model1 <- aov(Individuen ~ Kastenzahl + schlag, data=df.kasten.art.schlag)
+Model1 <- aov(Individuen ~ Kastenzahl + schlag, data=df.kasten.art.schlag)
 ```
 
 ```{r tab.4}
 Table4 <- pander(
-		 model1,
+		 Model1,
 		 caption="ANOVA: Individuen ~ Kastenzahl + Schlag"
 		 )
 Table4
@@ -225,7 +225,7 @@ Table4
 
 ```{r fig.6, fig.width=9, fig.height=9, fig.cap="Modellkritik Tabelle 4", warning=F}
 par(mfrow=c(2,2))
-plot(model1)
+plot(Model1)
 ```
 Die ANOVA zeigt, dass eine positiv lineare Beziehung zwischen Kastendichte und Individuendichte (p = 5.99 * e^-1) besteht und darüber hinaus einer ebenfalls hochsignifikanter, aber weitaus schwächerer (p = 0.04) Unterschied zwischen den Schlägen.
 
