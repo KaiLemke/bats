@@ -1,0 +1,68 @@
+---
+title: "Auswertung v2"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    toc: true
+    theme: journal
+    number_sections: true
+    fig_caption: true
+  pdf_document:
+    toc: true
+    number_sections: true
+    fig_caption: true
+  md_document:
+    toc: true      
+    variant: markdown_github
+---
+
+```{r libs, echo=FALSE}
+source("Auswertung/00-libs.R")
+```
+
+# Datensätze
+
+Die Auswertungen erfolgen für den gesamten Datensatz (**df**) sowie für jedes Kontrolljahr einzeln (**df10 bis df15**).
+Dabei ist zu beachten, dass 2010 das gesamte Untersuchungsgebiet kontrolliert wurde,
+da es sich um eine bezahlte Studie handelte;
+in den Folgejahren wurde das Projekt als rein ehrenamtliches Monitoring weitergeführt,
+daher konnten aus Zeitgründen nur Teilgebiete untersucht werden.
+> verlinke "gesamten Datensatz" auf Anhang
+
+```{r data.1, echo=FALSE}
+# Lade die Datensätze
+load("Auswertung/df"); str(df)
+load("Auswertung/df10")
+load("Auswertung/df11")
+load("Auswertung/df12")
+load("Auswertung/df13")
+load("Auswertung/df14")
+load("Auswertung/df15")
+load("Auswertung/l")
+```
+
+Einen Überblick über den Umfang der Kontrollen in den einzelnen Jahren geben die Kontrollierten Schläge.
+
+```{r data.2}
+# Kontrollen ~ Jahr
+tab.schlag <- with(df, table(x.schlag, x.koa))
+m.schlag <- as.data.frame.matrix(tab.schlag)
+m.schlag <- rbind(m.schlag, Summe=colSums(m.schlag))
+m.schlag <- cbind(m.schlag, gesamt=rowSums(m.schlag))
+```
+
+```{r tab.1}
+Table1 <- pander(
+		 m.schlag,
+		 caption="Datensätze pro Schlag",
+
+		 digits=0
+		 )
+Table1
+```
+
+# Welche Arten haben ihre Sommerquartiere im Untersuchungsgebiet?
+
+
+```{r}
+```
