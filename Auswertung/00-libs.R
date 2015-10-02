@@ -1,3 +1,0 @@
-library(pander)
-library(plyr)
-
