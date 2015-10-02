@@ -63,6 +63,67 @@ Table1
 
 # Welche Arten haben ihre Sommerquartiere im Untersuchungsgebiet?
 
+```{r list.1}
+levels(df$x.flart)
+```
+
+Von 2010 bis 2015 wurden acht Arten sowie nicht weiter bestimmte _Pipistrellus_-Arten gefunden:
+
+* Wasserfledermaus (_Myotis daubentonii_)
+* Großes Mausohr (_Myotis myotis_)
+* Bartfledermäuse (_Myotis mystacinus_ oder _Myotis brandtii_)
+* Fransenfledermaus (_Myotis nattereri_)
+* Großer Abernsegler (_Nyctalus noctula_)
+* Rauhautfledermaus (_Pipistrellus nathusii_)
+* Mückenfledermaus (_Pipistrellus pygmaeus_)
+* Braunes Langohr (_Plecotus auritus_)
+
+```{r data.3}
+# Quartiere pro Art
+tab.art <- with(df, table(x.flart, x.koa))
+m.art <- as.data.frame.matrix(tab.art)
+m.art <- m.art[-1,]
+m.art <- rbind(m.art, Summe=colSums(m.art))
+m.art <- cbind(m.art, gesamt=rowSums(m.art))
+```
+
+```{r tab.2}
+Table2 <- pander(
+		 m.art,
+		 caption="Quartiere pro Art",
+		 digits=0,
+		 split.table=Inf
+		 )
+Table2
+```
+```{r data.4}
+# Individuen pro Art
+df.ind.art <- ddply(
+		    df, 
+		    .(x.koa, x.flart), 
+		    summarise, Individuen = sum(y.flges)
+		    )
+```
+
+```{r fig.1, fig.width=9, fig.height=18, fig.cap="Individuen pro Art"}
+par(mfrow=c(7,1))
+for(i in 10:15){
+	with(
+	     subset(df.ind.art, x.koa == i),
+	     plot(Individuen ~ x.flart, 
+		  main=paste0("20", i),
+		  ylim=c(0,140)
+		  )
+	     )
+}
+with(df.ind.art,
+     plot(Individuen ~ x.flart,
+	  main="gesamt",
+	  ylim=c(0,140)
+	  )
+     )
+```
+
 
 ```{r}
 ```
