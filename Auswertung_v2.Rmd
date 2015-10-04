@@ -252,6 +252,190 @@ Für den Bereich Rotes Kreuz / Mitterbachl dürften die Offenwasserflächen rele
 für die Bereiche südlich der B300 dürfte die Nähe zu diesen relevant sein.
 Zudem bilden die bevorzugten Bereiche den Kern des Forstes mit seiner größten Ausdehnung.
 
+# Wie steht es um Quantität und Qualität der künstlichen Quartiere?
+
+
+```{r data.9}
+# Kastenzahlen zu Levels von koa und kz zugeordnet
+df.kz <- subset(df, select=c("x.koa", "x.kz"))
+df.kz$freq <- rep(0, length(df.kz$x.koa)) # leerer Vektor der richtigen Länge
+
+# ermittelt die Anzahl der kontrollierten Kästen für die Kombination aus koa und kz
+f.temp <- function(i) {
+	x <- df.kz$x.koa[i]
+	y <- df.kz$x.kz[i]
+	temp <- subset(df.kz, x.koa == x & x.kz == y)
+	temp <- length(temp$freq)
+	temp
+} 
+
+# Schreibt die Werte in den Vektor
+for(i in seq_along(df.kz$freq)) {
+	df.kz$freq[i] <- f.temp(i)
+}
+```
+
+```{r data.10}
+# kontrollierte Kästen pro Jahr
+tab.koa <- table(df$x.koa) 
+v.koa <- as.numeric(tab.koa)
+
+# kontrollierte Schläge pro Jahr
+v.schlag <- rep(0, length(levels(df$x.koa))) # leerer Vektor der Länge der Kontrollen
+f.temp <- function(x){
+	temp <- subset(df, x.koa == x, select="x.schlag")
+	temp <- as.numeric(table(temp))
+	temp <- subset(temp, temp != 0)
+	temp <- length(temp)
+	temp
+} # ermittelt die Anzahl der kontrollierten Schläge (Level != 0)
+for(i in 1:6){
+	x <- c(10:15)[i]
+	v.schlag[i] <- f.temp(x)
+} # schreibt die Werte in den Vektor
+```
+
+```{r fig.7, fig.width=9, fig.height=9, fig.cap="oben: Anzahl der kontrollierten Kästen in Summe und nach Kastenzustand \n unten: Summe der kontrollierten Kästen korrigiert durch die Anzahl der kontrollierten Schläge", warning=F}
+par(mfrow=c(2,1))
+
+# leerer Plot
+plot(
+      freq ~ x.koa, 
+      data = df.kz,
+      ylim = c(0, max(m.schlag[, -7]) + 20),
+      type = "n",
+      axes = 0,
+      main = "kontrollierte Kästen pro Jahr und Zustand",
+      xlab = "Kontrolljahr",
+      ylab = "kontrollierte Kästen"
+      )
+axis(1)
+axis(2, at=seq(0, max(m.schlag[, -7]) + 20, 20))
+box()
+
+# Punkte für die Kastenzustände
+for(i in seq_along(levels(df.kz$x.kz))) {
+	points(
+	     freq ~ x.koa,
+	     data = subset(
+			   df.kz,
+			   x.kz == levels(df.kz$x.kz)[i]
+			   ),
+	     pch = i
+	     )
+}
+
+# Summe der kontrollierten Kästen pro Jahr
+lines(as.numeric(m.schlag["Summe",-7]) ~ as.numeric(10:15), lty=3)
+
+legend(
+       14, 170, 
+       c(levels(df.kz$x.kz), "Summe"),
+       pch=c(1:4, NA),
+       lty=c(rep(0,4),3)
+       )
+
+plot(
+     as.numeric(m.schlag["Summe", -7]) / v.schlag ~ c(10:15),
+     type="l", 
+     lty=5,
+     main="kontrollierte Kästen pro Jahr und Schlag",
+     xlab = "Kontrolljahr",
+     ylab = "kontrollierte Kästen"
+     )
+```
+
+Abbildung 7 zeigt in der oberen Darstellung einen Rückgang der intakten Kästen von 2010 auf 2011 und dann einen leichten Aufwärtstrend, der darauf zurückzuführend ist, dass Förster Kuchenreuther für sein Revier seit 2011 jedes Jahr eine Reihe von Kästen sponsort, die bei den Kontrollen aufgehangen werden.
+Die Zahl der intakten Kästen 2010 dürfte zu hoch gegriffen sein, da hier wohl noch der ein oder andere Schaden unentdeckt geblieben sein dürfte, der Trend jedoch ist realistisch.
+Die anderen Kastenzustände sind weitgehend konstant, sodass der Rückgang der intakten Kästen einen Verlust in der Summe kennzeichnet,
+
+Allerdings beinhaltet die obere Darstellung einen Fehler: 
+Der Umfang der Kontrollen ist von Jahr zu Jahr unterschiedlich.
+Daher verwendet die untere Darstellung die Anzahl der kontrollierten Schläge als Maß für den Umfang der Kontrollen und korrigiert die die Summe um diesen Faktor.
+
+Die korrigierte Kurve scheint nun also eine positive Entwicklung in der Kastenzahl darzustellen, was im folgenden zu Überprüfen gilt.
+
+```{r data.11}
+# Werte von v.schlag in data frame mit den beiden freq's
+df.kz.schlag <- data.frame(
+			   x.koa = df$x.koa,
+			   x.kz = df$x.kz,
+			   x.schlag = df$x.schlag,
+			   counts.kz = df.kz$freq,
+			   num.schlag = rep(0, length(df$x.koa))
+			   )
+f.temp <- function(x) {
+	temp <- c(10:15)
+	x <- which(temp == x)
+	v.schlag[x]
+}
+for(i in seq_along(df.kz.schlag$x.koa)) {
+	x <- df.kz.schlag$x.koa[i]
+	df.kz.schlag$num.schlag[i] <- f.temp(x)
+}
+
+# Anzahl der kontrollierten Schläge als Korrektur 
+# für die Anzahl der kontrollierten Kästen
+df.kz.schlag$freq <- df.kz.schlag$counts.kz / df.kz.schlag$num.schlag
+
+
+# ANOVA
+
+Model2 <- lm(freq ~ x.koa, data=df.kz.schlag)
+```
+
+```{r out.}
+summary(Model2)
+```
+
+```{r data.12}
+v.freq <- rep(0,6)
+
+for(i in 10:15) {
+	temp <- c(10:15)
+	x <- which(temp == i)
+	v.freq[x] <- with(
+			  subset(df.kz.schlag, x.koa == i),
+			  mean(freq)
+			  )
+}
+
+Model3 <- aov(v.freq ~ temp)
+```
+
+```{r tab.5}
+Table5 <- pander(
+		 Model3,
+		 caption="Regression: Kastenzahl pro Schlag ~ Kontrolljahr"
+		 )
+Table5
+```
+
+Um Pseudoreplikation zu vermeiden, dürfen nur die mittleren Kastenanzahlen verwendet werden. Das Modell zeigt: 1 und 4 Freiheitsgrade, keine Signifikanz (p = 0.78). 
+Das bedeutet, es lässt sich momentan keine fundierte Aussage über die Entwicklung der Kastenanzahl machen.
+
+```{r data.13}
+for(i in 10:15) {
+	temp <- c(10:15)
+	x <- which(temp == i)
+	v.freq[x] <- with(
+			  subset(df, x.koa == i),
+			  mean(y.kz)
+			  )
+}
+
+Model4 <- aov(v.freq ~ temp)
+```
+
+```{r tab.6}
+Table6 <- pander(
+		 Model4,
+		 caption="Regression: Kastenzustand pro Schlag ~ Kontrolljahr"
+		 )
+Table6
+```
+
+Für die Kastenzustände ergibt sich das gleiche Bild: Nach 6 Jahren lässt sich noch keine Prognose für die Zukunft treffen.
 
 ```{r}
 ```
