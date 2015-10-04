@@ -9,12 +9,12 @@ m.q.schlag <- as.data.frame.matrix(tab.q.schlag)
 m.q.schlag <- rbind(m.q.schlag, Summe=colSums(m.q.schlag))
 m.q.schlag <- cbind(m.q.schlag, gesamt=rowSums(m.q.schlag))
 
-Table3 <- pander(
+Table4 <- pander(
 		 m.q.schlag,
 		 caption="Quartiere pro Schlag",
 		 digits=0
 		 )
-Table3
+Table4
 
 # Individuen pro Schlag
 df.art.schlag <- ddply(
@@ -82,11 +82,11 @@ with(df.kasten.art.schlag,
 # ANOVA: Individuen ~ Kastenzahl + schlag
 Model1 <- aov(Individuen ~ Kastenzahl + x.schlag, data=df.kasten.art.schlag)
 
-Table4 <- pander(
+Table5 <- pander(
 		 Model1,
 		 caption="ANOVA: Individuen ~ Kastenzahl + Schlag"
 		 )
-Table4
+Table5
 
 par(mfrow=c(2,2))
 plot(Model1)

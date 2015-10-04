@@ -103,38 +103,105 @@ df.ind.art <- ddply(
 		    .(x.koa, x.flart), 
 		    summarise, Individuen = sum(y.flges)
 		    )
+df.ind.art <- subset(df.ind.art, x.flart != 0) 
 ```
 
-```{r fig.1, fig.width=9, fig.height=18, fig.cap="Individuen pro Art"}
-par(mfrow=c(7,1))
-for(i in 10:15){
-	with(
-	     subset(df.ind.art, x.koa == i),
-	     plot(Individuen ~ x.flart, 
-		  main=paste0("20", i),
-		  ylim=c(0,140)
-		  )
-	     )
-}
-with(df.ind.art,
-     plot(Individuen ~ x.flart,
-	  main="gesamt",
-	  ylim=c(0,140)
-	  )
+```{r tab.3}
+Table3 <- pander(
+		 df.ind.art,
+		 caption="Summe der Individuen pro Art",
+		 digits=0
+		 )
+Table3
+```
+
+```{r data.5}
+# kontrollierte Schläge pro Jahr
+
+v.schlag <- rep(0, length(levels(df$x.koa))) # leerer Vektor der Länge der Kontrollen
+f.temp <- function(x){
+	temp <- subset(df, x.koa == x, select="x.schlag")
+	temp <- as.numeric(table(temp))
+	temp <- subset(temp, temp != 0)
+	temp <- length(temp)
+	temp
+} # ermittelt die Anzahl der kontrollierten Schläge (Level != 0)
+for(i in 1:6){
+	x <- c(10:15)[i]
+	v.schlag[i] <- f.temp(x)
+} # schreibt die Werte in den Vektor
+
+# Summe der Individuen pro Jahr
+df.ind.koa <- ddply(df, .(x.koa), summarise, ArtSumme = sum(y.flges))
+df.ind.koa$counts.schlag <- v.schlag
+df.ind.koa$ArtSummeProSchlag <- df.ind.koa$ArtSumme / v.schlag
+```
+
+```{r fig.1, fig.width=9, fig.height=9, fig.cap="**oben:** Zählergebnisse der Arten im Vergleich im logarithmischen Maßstab **unten:** Gesamtzählergebnisse korrigiert um die Anzahl der kontrollierten Schläge"}
+.parsave <- par(no.readonly=T)
+par(xpd=T, 
+    mar=.parsave$mar + c(0,0,0,10),
+    mfrow=c(2,1)
+    )
+
+plot(
+     log(Individuen) ~ x.koa,
+     data = df.ind.art,
+     ylim = c(0, log(max(df.ind.koa$ArtSumme) + 2)),
+     type = "n",
+     main = "Summe der Individuen pro Jahr und Art",
+     xlab = "Kontrolljahr",
+     ylab = "Logarithmus der Individuen"
      )
+
+# Punkte für die Arten
+for(i in seq_along(levels(df.ind.art$x.flart))) {
+	points(
+	       log(Individuen) ~ x.koa,
+	       data = subset(
+			     df.ind.art,
+			     x.flart == levels(df.ind.art$x.flart)[i]
+			     ),
+	       pch = i
+	       )
+}
+
+lines(log(ArtSumme) ~ x.koa, data=df.ind.koa, lty=3)
+
+legend(
+       15.3, 5,
+       c(levels(df.ind.art$x.flart)[-1], "Summe"),
+       pch=c(seq_along(levels(df.ind.art$x.flart)[-1]) + 1, NA), # die Null braucht keiner
+       lty=c(rep(0, length(levels(df.ind.art$x.flart)[-1])), 3)
+       )
+
+plot(
+     ArtSummeProSchlag ~ x.koa,
+     data = df.ind.koa,
+     type = "l",
+     lty = 3,
+     main = "Summe der Individuen pro Jahr und Schlag",
+     xlab = "Kontrolljahr",
+     ylab = "Summe der Individuen / Summe der Schläge"
+     )
+
+par(.parsave)
 ```
 
-Die Wasserfledermaus (**Myotis daubentonii**), die 2010 nur mit einem Individuum beobachtet wurde, scheint weitaus häufiger zu sein. 
-Da die Schwankungen in den Zählergebnissen nicht mit denen in den Gebieten Rotes Kreuz / Mitterbachl, die offenes Wasser bieten, übereinstimmen, ist von einer methodischen Zählungenauigkeit auszugehen.
+Die Wasserfledermaus (**Myotis daubentonii**), die 2010 nur mit einem Individuum beobachtet wurde (s. Tabelle 3), scheint weitaus häufiger zu sein. 
+Da die Schwankungen in den Zählergebnissen nicht mit denen in den Gebieten Rotes Kreuz / Mitterbachl, die offenes Wasser bieten, übereinstimmen (s. Tabelle 1), ist von einer methodischen Zählungenauigkeit auszugehen.
 Die Fransenfledermaus (**Myotis nattereri**) ist nach wie vor die dominierende Art im Feilenforst.
-Leider lässt sich beim Braunen Langohr (**Plecotus auritus**) eine deutlicher Rückgang in der Quartierzahl verzeichnen.
+Leider lässt sich beim Braunen Langohr (**Plecotus auritus**) ein deutlicher Rückgang in der Quartierzahl verzeichnen.
 Es kann sein, dass 2010 ein Ausreißer nach oben war, es kann immer noch Zählungenauigkeit sein, aber es ist ein deutlicher Rückgang zu befürchten.
+
+Insgesamt schwanken die Zählergebnisse deutlich. Verantwortlich dafür dürfte das Verhalten der Waldfledermäuse sein, regelmäßig ihre Quartiere zu wechseln.
+Um konstantere Zahlen zu bekommen, und eine Aussage über die Entwicklung treffen zu können, müsste das gesamte Untersuchungsgebiet an einem Tag kontrolliert werden, wozu es ungefähr fünf Trupps à zwei bis drei Kontrolleuren, von denen mindestens einer Artkenntnis hat, bräuchte.
 
 # Wo sind die Verbreitungsschwerpunkte?
 
 Als geographische Anhaltspunkte dienen uns hier die von oben bereits bekannten Forst-Schläge.
 
-```{r data.5}
+```{r data.6}
 # Quartiere pro Schlag
 tab.q.schlag <- with(
 		   subset(
@@ -147,16 +214,16 @@ m.q.schlag <- rbind(m.q.schlag, Summe=colSums(m.q.schlag))
 m.q.schlag <- cbind(m.q.schlag, gesamt=rowSums(m.q.schlag))
 ```
 
-```{r tab.3}
-Table3 <- pander(
+```{r tab.4}
+Table4 <- pander(
 		 m.q.schlag,
 		 caption="Quartiere pro Schlag",
 		 digits=0
 		 )
-Table3
+Table4
 ```
 
-```{r data.6}
+```{r data.7}
 df.art.schlag <- ddply(df, .(x.koa, x.schlag), summarise, Individuen = sum(y.flges))
 ```
 
@@ -179,7 +246,7 @@ with(df.art.schlag,
      )
 ```
 
-```{r data.7}
+```{r data.8}
 # Kästen pro Schlag
 v.kasten.schlag <- rep(0, length(df.art.schlag$Individuen))
 for(
@@ -230,22 +297,23 @@ Sowohl bei den Quartieren (Tabelle 3) als auch bei den Individuenzahlen (Abb. 2)
 Die Abbildungen 4 und 5 legen nahe, dass sowohl die Schläge an sich relevant sind, da sich die durchschnittliche Individuenzahl pro Kasten unterscheidet, 
 als auch die Kastendichte.
 
-```{r data.8}
+```{r data.9}
 Model1 <- aov(Individuen ~ Kastenzahl + x.schlag, data=df.kasten.art.schlag)
 ```
 
-```{r tab.4}
-Table4 <- pander(
+```{r tab.5}
+Table5 <- pander(
 		 Model1,
 		 caption="ANOVA: Individuen ~ Kastenzahl + Schlag"
 		 )
-Table4
+Table5
 ```
 
 ```{r fig.6, fig.width=9, fig.height=9, fig.cap="Modellkritik Tabelle 4", warning=F}
 par(mfrow=c(2,2))
 plot(Model1)
 ```
+
 Die ANOVA zeigt, dass eine positiv lineare Beziehung zwischen Kastendichte und Individuendichte (p = 5.99 * e^-1) besteht und darüber hinaus einer ebenfalls hochsignifikanter, aber weitaus schwächerer (p = 0.04) Unterschied zwischen den Schlägen.
 
 Für den Bereich Rotes Kreuz / Mitterbachl dürften die Offenwasserflächen relevant sein, da diese ein gutes Nahrungsangebot generieren,
@@ -255,7 +323,7 @@ Zudem bilden die bevorzugten Bereiche den Kern des Forstes mit seiner größten 
 # Wie steht es um Quantität und Qualität der künstlichen Quartiere?
 
 
-```{r data.9}
+```{r data.10}
 # Kastenzahlen zu Levels von koa und kz zugeordnet
 df.kz <- subset(df, select=c("x.koa", "x.kz"))
 df.kz$freq <- rep(0, length(df.kz$x.koa)) # leerer Vektor der richtigen Länge
@@ -275,27 +343,7 @@ for(i in seq_along(df.kz$freq)) {
 }
 ```
 
-```{r data.10}
-# kontrollierte Kästen pro Jahr
-tab.koa <- table(df$x.koa) 
-v.koa <- as.numeric(tab.koa)
-
-# kontrollierte Schläge pro Jahr
-v.schlag <- rep(0, length(levels(df$x.koa))) # leerer Vektor der Länge der Kontrollen
-f.temp <- function(x){
-	temp <- subset(df, x.koa == x, select="x.schlag")
-	temp <- as.numeric(table(temp))
-	temp <- subset(temp, temp != 0)
-	temp <- length(temp)
-	temp
-} # ermittelt die Anzahl der kontrollierten Schläge (Level != 0)
-for(i in 1:6){
-	x <- c(10:15)[i]
-	v.schlag[i] <- f.temp(x)
-} # schreibt die Werte in den Vektor
-```
-
-```{r fig.7, fig.width=9, fig.height=9, fig.cap="oben: Anzahl der kontrollierten Kästen in Summe und nach Kastenzustand \n unten: Summe der kontrollierten Kästen korrigiert durch die Anzahl der kontrollierten Schläge", warning=F}
+```{r fig.7, fig.width=9, fig.height=9, fig.cap="**oben:** Anzahl der kontrollierten Kästen in Summe und nach Kastenzustand **unten:** Summe der kontrollierten Kästen korrigiert durch die Anzahl der kontrollierten Schläge", warning=F}
 par(mfrow=c(2,1))
 
 # leerer Plot
@@ -384,7 +432,7 @@ df.kz.schlag$freq <- df.kz.schlag$counts.kz / df.kz.schlag$num.schlag
 Model2 <- lm(freq ~ x.koa, data=df.kz.schlag)
 ```
 
-```{r out.}
+```{r out.1}
 summary(Model2)
 ```
 
@@ -403,12 +451,12 @@ for(i in 10:15) {
 Model3 <- aov(v.freq ~ temp)
 ```
 
-```{r tab.5}
-Table5 <- pander(
+```{r tab.6}
+Table6 <- pander(
 		 Model3,
 		 caption="Regression: Kastenzahl pro Schlag ~ Kontrolljahr"
 		 )
-Table5
+Table6
 ```
 
 Um Pseudoreplikation zu vermeiden, dürfen nur die mittleren Kastenanzahlen verwendet werden. Das Modell zeigt: 1 und 4 Freiheitsgrade, keine Signifikanz (p = 0.78). 
@@ -427,12 +475,12 @@ for(i in 10:15) {
 Model4 <- aov(v.freq ~ temp)
 ```
 
-```{r tab.6}
-Table6 <- pander(
+```{r tab.7}
+Table7 <- pander(
 		 Model4,
 		 caption="Regression: Kastenzustand pro Schlag ~ Kontrolljahr"
 		 )
-Table6
+Table7
 ```
 
 Für die Kastenzustände ergibt sich das gleiche Bild: Nach 6 Jahren lässt sich noch keine Prognose für die Zukunft treffen.

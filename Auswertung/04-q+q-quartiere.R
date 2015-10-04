@@ -17,25 +17,6 @@ for(i in seq_along(df.kz$freq)) {
 }
 
 
-# kontrollierte Kästen pro Jahr
-tab.koa <- table(df$x.koa) 
-v.koa <- as.numeric(tab.koa)
-
-# kontrollierte Schläge pro Jahr
-v.schlag <- rep(0, length(levels(df$x.koa))) # leerer Vektor der Länge der Kontrollen
-f.temp <- function(x){
-	temp <- subset(df, x.koa == x, select="x.schlag")
-	temp <- as.numeric(table(temp))
-	temp <- subset(temp, temp != 0)
-	temp <- length(temp)
-	temp
-} # ermittelt die Anzahl der kontrollierten Schläge (Level != 0)
-for(i in 1:6){
-	x <- c(10:15)[i]
-	v.schlag[i] <- f.temp(x)
-} # schreibt die Werte in den Vektor
-
-
 par(mfrow=c(2,1))
 
 # leerer Plot
