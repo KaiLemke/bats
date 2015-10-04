@@ -1,5 +1,5 @@
 ---
-title: "Auswertung v2"
+title: "Auswertung v1.1"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
   html_document:
