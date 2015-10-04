@@ -2,9 +2,9 @@
 tab.q.schlag <- with(
 		   subset(
 			  df,
-			  qtyp != 0
+			  x.qtyp != 0
 			  ),
-		   table(schlag, koa))
+		   table(x.schlag, x.koa))
 m.q.schlag <- as.data.frame.matrix(tab.q.schlag)
 m.q.schlag <- rbind(m.q.schlag, Summe=colSums(m.q.schlag))
 m.q.schlag <- cbind(m.q.schlag, gesamt=rowSums(m.q.schlag))
@@ -17,20 +17,24 @@ Table3 <- pander(
 Table3
 
 # Individuen pro Schlag
-df.art.schlag <- ddply(df, .(koa, schlag), summarise, Individuen = sum(flges))
+df.art.schlag <- ddply(
+		       df, 
+		       .(x.koa, x.schlag), 
+		       summarise, Individuen = sum(y.flges)
+		       )
 
 par(mfrow=c(7,1))
 for(i in 10:15){
 	with(
-	     subset(df.art.schlag, koa == i),
-	     plot(Individuen ~ schlag, 
+	     subset(df.art.schlag, x.koa == i),
+	     plot(Individuen ~ x.schlag, 
 		  main=paste0("20", i),
 		  ylim=c(0,100)
 		  )
 	     )
 }
 with(df.art.schlag,
-     plot(Individuen ~ schlag,
+     plot(Individuen ~ x.schlag,
 	  main="gesamt",
 	  ylim=c(0,100)
 	  )
@@ -42,8 +46,8 @@ for(
     i in seq_along(v.kasten.schlag)
     ){
 	v.kasten.schlag[i] <- m.schlag[
-				       paste0(df.art.schlag$schlag[i]), 
-				       paste0(df.art.schlag$koa[i])
+				       paste0(df.art.schlag$x.schlag[i]), 
+				       paste0(df.art.schlag$x.koa[i])
 				       ]
 }
 df.kasten.art.schlag <- df.art.schlag
@@ -53,14 +57,14 @@ df.kasten.art.schlag$IndProKasten <- with(df.kasten.art.schlag,
 					  )
 
 with(df.kasten.art.schlag,
-	     plot(Kastenzahl ~ schlag,
+	     plot(Kastenzahl ~ x.schlag,
 		  main="gesamt"
 		  )
      )
 
 # Indivdiuen pro Kasten und Schlag
 with(df.kasten.art.schlag,
-     plot(IndProKasten ~ schlag,
+     plot(IndProKasten ~ x.schlag,
 	  main="gesamt"
 	  )
      )
@@ -76,7 +80,7 @@ with(df.kasten.art.schlag,
 )
 
 # ANOVA: Individuen ~ Kastenzahl + schlag
-Model1 <- aov(Individuen ~ Kastenzahl + schlag, data=df.kasten.art.schlag)
+Model1 <- aov(Individuen ~ Kastenzahl + x.schlag, data=df.kasten.art.schlag)
 
 Table4 <- pander(
 		 Model1,
