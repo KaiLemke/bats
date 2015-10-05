@@ -162,6 +162,7 @@ for(i in seq_along(levels(df.ind.art$x.flart))) {
 			     df.ind.art,
 			     x.flart == levels(df.ind.art$x.flart)[i]
 			     ),
+	       col = i,
 	       pch = i
 	       )
 }
@@ -171,6 +172,7 @@ lines(log(ArtSumme) ~ x.koa, data=df.ind.koa, lty=3)
 legend(
        15.3, 5,
        c(levels(df.ind.art$x.flart)[-1], "Summe"),
+       col=c(seq_along(levels(df.ind.art$x.flart)[-1]) + 1, NA), # die Null braucht keiner
        pch=c(seq_along(levels(df.ind.art$x.flart)[-1]) + 1, NA), # die Null braucht keiner
        lty=c(rep(0, length(levels(df.ind.art$x.flart)[-1])), 3)
        )
@@ -227,25 +229,6 @@ Table4
 df.art.schlag <- ddply(df, .(x.koa, x.schlag), summarise, Individuen = sum(y.flges))
 ```
 
-```{r fig.2, fig.width=9, fig.height=18, fig.cap="Individuen pro Schlag"}
-par(mfrow=c(7,1))
-for(i in 10:15){
-	with(
-	     subset(df.art.schlag, x.koa == i),
-	     plot(Individuen ~ x.schlag, 
-		  main=paste0("20", i),
-		  ylim=c(0,100)
-		  )
-	     )
-}
-with(df.art.schlag,
-     plot(Individuen ~ x.schlag,
-	  main="gesamt",
-	  ylim=c(0,100)
-	  )
-     )
-```
-
 ```{r data.8}
 # Kästen pro Schlag
 v.kasten.schlag <- rep(0, length(df.art.schlag$Individuen))
@@ -264,37 +247,98 @@ df.kasten.art.schlag$IndProKasten <- with(df.kasten.art.schlag,
 					  )
 ```
 
-```{r fig.3, fig.width=9, fig.height=5, fig.cap="Kästen pro Schlag"}
-with(df.kasten.art.schlag,
-	     plot(Kastenzahl ~ x.schlag,
-		  main="gesamt"
-		  )
+```{r fig.2, fig.width=9, fig.height=9, fig.cap="Individuen und Kästen pro Schlag"}
+par(xpd=T, 
+    mar=.parsave$mar + c(0,0,0,10),
+    mfrow=c(2,1)
+    )
+
+plot(
+     log(Individuen) ~ x.koa,
+     data = df.art.schlag,
+     ylim = c(0, log(max(df.ind.koa$ArtSumme) + 2)),
+     type = "n",
+     main = "Summe der Individuen pro Jahr und Schlag",
+     xlab = "Kontrolljahr",
+     ylab = "Logarithmus der Individuen"
      )
-```
 
-```{r fig.4, fig.width=9, fig.height=5, fig.cap="Individuen pro Kasten und Schlag"}
-# Indivdiuen pro Kasten und Schlag
-with(df.kasten.art.schlag,
-     plot(IndProKasten ~ x.schlag,
-	  main="gesamt"
-	  )
+# Punkte für die Schläge
+for(i in seq_along(levels(df.art.schlag$x.schlag))) {
+	points(
+	       log(Individuen) ~ x.koa,
+	       data = subset(
+			     df.art.schlag,
+			     x.schlag == levels(df.art.schlag$x.schlag)[i]
+			     ),
+	       col = i,
+	       pch = i
+	       )
+}
+
+lines(log(ArtSumme) ~ x.koa, data=df.ind.koa, lty=3)
+
+legend(
+       15.3, 5,
+       c(levels(df.art.schlag$x.schlag), "Summe"),
+       col=c(seq_along(levels(df.art.schlag$x.schlag)), NA),
+       pch=c(seq_along(levels(df.art.schlag$x.schlag)), NA),
+       lty=c(rep(0, length(levels(df.art.schlag$x.schlag))), 3)
+       )
+
+plot(
+     Individuen ~ x.schlag,
+     data=df.kasten.art.schlag,
+     at=seq_along(levels(df.kasten.art.schlag$x.schlag)) - 0.2,
+     col="white",
+     main="Individuen und Kästen pro Schlag",
+     xlab="Schlag",
+     ylab=""
      )
+
+plot(
+     Kastenzahl ~ x.schlag,
+     data=df.kasten.art.schlag,
+     axes=0,
+     xlab=NULL,
+     ylab=NULL,
+     col="lightgray",
+     add=T
+     )
+
+legend(
+       16.3, 80,
+       c("Individuen", "Kästen"),
+       c("white", "lightgray")
+       )
+
+par(.parsave)
 ```
 
-```{r fig.5, fig.width=9, fig.height=5, fig.cap="Individuen pro Kasten"}
-# Individuen pro Kasten
-with(df.kasten.art.schlag,
-     {
-	     plot(Individuen ~ Kastenzahl,
-		  main="gesamt"
-		  )
-	     abline(lm(Individuen ~ Kastenzahl))
-     }
-)
+```{r fig.3, fig.width=9, fig.height=9, fig.cap="Korrellation Individuen- und Kastendichte"}
+par(mfrow=c(2,1))
+
+plot(
+     IndProKasten ~ x.schlag,
+     data=df.kasten.art.schlag,
+     main="Individuen pro Kasten und Schlag",
+     xlab="Schlag",
+     ylab="Individuen"
+     )
+
+plot(Individuen ~ Kastenzahl,
+     data=df.kasten.art.schlag,
+     main="Individuen in Abhängigkeit von der Kastendichte",
+     xlab="Kastenzahl pro Schlag",
+     ylab="Individuen"
+     )
+abline(lm(Individuen ~ Kastenzahl, data=df.kasten.art.schlag))
+
+par(.parsave)
 ```
 
-Sowohl bei den Quartieren (Tabelle 3) als auch bei den Individuenzahlen (Abb. 2) zeigt sich eine Häufung in einer Reihe von Schlägen, die auf der Karte betrachtet weitgehend zusammenhängen. Bei näherer Betrachtung zeigt sich jedoch, dass dort auch die Kastendichte höher ist (Abb. 3).
-Die Abbildungen 4 und 5 legen nahe, dass sowohl die Schläge an sich relevant sind, da sich die durchschnittliche Individuenzahl pro Kasten unterscheidet, 
+Sowohl bei den Quartieren (Tabelle 4) als auch bei den Individuenzahlen zeigt sich eine Häufung in einer Reihe von Schlägen, die auf der Karte betrachtet weitgehend zusammenhängen. Bei näherer Betrachtung zeigt sich jedoch, dass dort auch die Kastendichte höher ist (Abb. 2).
+Die Abbildung 3 legt nahe, dass sowohl die Schläge an sich relevant sind, da sich die durchschnittliche Individuenzahl pro Kasten unterscheidet, 
 als auch die Kastendichte.
 
 ```{r data.9}
@@ -309,7 +353,7 @@ Table5 <- pander(
 Table5
 ```
 
-```{r fig.6, fig.width=9, fig.height=9, fig.cap="Modellkritik Tabelle 4", warning=F}
+```{r fig.4, fig.width=9, fig.height=9, fig.cap="Modellkritik Tabelle 4", warning=F}
 par(mfrow=c(2,2))
 plot(Model1)
 ```
@@ -343,7 +387,7 @@ for(i in seq_along(df.kz$freq)) {
 }
 ```
 
-```{r fig.7, fig.width=9, fig.height=9, fig.cap="**oben:** Anzahl der kontrollierten Kästen in Summe und nach Kastenzustand **unten:** Summe der kontrollierten Kästen korrigiert durch die Anzahl der kontrollierten Schläge", warning=F}
+```{r fig.5, fig.width=9, fig.height=9, fig.cap="**oben:** Anzahl der kontrollierten Kästen in Summe und nach Kastenzustand **unten:** Summe der kontrollierten Kästen korrigiert durch die Anzahl der kontrollierten Schläge", warning=F}
 par(mfrow=c(2,1))
 
 # leerer Plot
@@ -393,7 +437,7 @@ plot(
      )
 ```
 
-Abbildung 7 zeigt in der oberen Darstellung einen Rückgang der intakten Kästen von 2010 auf 2011 und dann einen leichten Aufwärtstrend, der darauf zurückzuführend ist, dass Förster Kuchenreuther für sein Revier seit 2011 jedes Jahr eine Reihe von Kästen sponsort, die bei den Kontrollen aufgehangen werden.
+Abbildung 5 zeigt in der oberen Darstellung einen Rückgang der intakten Kästen von 2010 auf 2011 und dann einen leichten Aufwärtstrend, der darauf zurückzuführend ist, dass Förster Kuchenreuther für sein Revier seit 2011 jedes Jahr eine Reihe von Kästen sponsort, die bei den Kontrollen aufgehangen werden.
 Die Zahl der intakten Kästen 2010 dürfte zu hoch gegriffen sein, da hier wohl noch der ein oder andere Schaden unentdeckt geblieben sein dürfte, der Trend jedoch ist realistisch.
 Die anderen Kastenzustände sind weitgehend konstant, sodass der Rückgang der intakten Kästen einen Verlust in der Summe kennzeichnet,
 

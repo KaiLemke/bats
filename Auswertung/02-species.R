@@ -1,4 +1,4 @@
-evels(df$x.flart)
+levels(df$x.flart)
 
 # Quartiere pro Art
 tab.art <- with(df, table(x.flart, x.koa))
@@ -22,6 +22,7 @@ df.ind.art <- subset(df.ind.art, x.flart != 0)
 Table3 <- pander(
 		 df.ind.art,
 		 caption="Summe der Individuen pro Art",
+		 digits=0
 		 )
 Table3
 
@@ -50,7 +51,7 @@ df.ind.koa$ArtSummeProSchlag <- df.ind.koa$ArtSumme / v.schlag
 
 .parsave <- par(no.readonly=T)
 par(xpd=T, 
-    mar=parsave$mar + c(0,0,0,10),
+    mar=.parsave$mar + c(0,0,0,10),
     mfrow=c(2,1)
     )
 
