@@ -19,10 +19,14 @@ output:
   md_document:
     toc: true      
     variant: markdown_github
+  word_document:
+    fig_width: 9
+    fig_height: 9
+    fig_caption: true
 ---
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(fig.align="center", fig.path="Figs/", echo=FALSE, warnings=FALSE, message=FALSE, cache=FALSE)
+knitr::opts_chunk$set(fig.path="Figs/", echo=FALSE, warnings=FALSE, message=FALSE, cache=FALSE)
 ```
 
 ```{r libs, echo=FALSE}
